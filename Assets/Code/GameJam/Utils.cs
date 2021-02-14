@@ -98,5 +98,13 @@ namespace GameJam
 
 	        return false;
         }
+
+        public static (Vector3, Vector3) GetBox(Vector3 start, Vector3 end)
+        {
+	        var size = new Vector3(end.x - start.x, end.y - start.y, 1f);
+	        var origin = new Vector3(start.x + size.x / 2f, start.y + size.y / 2f, 0f);
+
+	        return (origin, size);
+        }
 	}
 }

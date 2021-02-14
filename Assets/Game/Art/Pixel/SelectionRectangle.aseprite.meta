@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 1bd630ecc9830407dbcda4ef3808c8be
+guid: 43abfa014b04c0a4e8fed35014758a52
 ScriptedImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -12,7 +12,7 @@ ScriptedImporter:
     importType: 0
     transparencyMode: 0
     transparentColor: {r: 1, g: 0, b: 1, a: 1}
-    pixelsPerUnit: 32
+    pixelsPerUnit: 16
     spriteAlignment: 0
     spritePivot: {x: 0.5, y: 0.5}
     generateAnimations: 1
@@ -33,10 +33,10 @@ ScriptedImporter:
     wrapModeW: 0
     alphaIsTransparency: 1
     spriteMode: 1
-    spritePixelsPerUnit: 100
+    spritePixelsPerUnit: 16
     spriteTessellationDetail: 0
-    spriteExtrude: 1
-    spriteMeshType: 1
+    spriteExtrude: 0
+    spriteMeshType: 0
     spriteAlignment: 0
     spritePivot: {x: 0, y: 0}
     spriteBorder: {x: 0, y: 0, z: 0, w: 0}
@@ -67,6 +67,18 @@ ScriptedImporter:
     mipmapFadeDistanceEnd: 3
   animationSettings: []
   texture: {instanceID: 0}
-  spriteImportData: []
+  spriteImportData:
+  - name: SelectionRectangle
+    rect:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 16
+      height: 16
+    alignment: 0
+    pivot: {x: 0.5, y: 0.5}
+    border: {x: 0, y: 0, z: 0, w: 0}
+    tessellationDetail: 0
+    spriteID: eed12a52ce7717144a6e7571bd3f33d8
   spriteRects: []
-  selectedImporter: 0
+  selectedImporter: 1

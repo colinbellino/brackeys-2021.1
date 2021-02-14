@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 using Button = UnityEngine.UI.Button;
+using static GameJam.Utils;
 
 namespace GameJam
 {
@@ -10,6 +12,8 @@ namespace GameJam
 	{
 		[Header("Gameplay")]
 		[SerializeField] private GameObject _gameplayRoot;
+		[SerializeField] private Text _debugText;
+		[SerializeField] private SpriteRenderer _selectionRectangle;
 		[Header("Victory")]
 		[SerializeField] private GameObject _victoryRoot;
 		[SerializeField] private Button _victoryRetryButton;
@@ -40,5 +44,26 @@ namespace GameJam
 		public void HideVictory() { _victoryRoot.SetActive(false); }
 		public void ShowDefeat() { _defeatRoot.SetActive(true); }
 		public void HideDefeat() { _defeatRoot.SetActive(false); }
+
+		public void SelectSelectedCharacters(List<Character> characters)
+		{
+			_debugText.text = "Selected characters:\n";
+			foreach (var character in characters)
+			{
+				_debugText.text += $"- {character.Name}\n";
+			}
+		}
+
+		public void SetSelectionRectangle(Vector3 start, Vector3 end)
+		{
+			var (origin, size) = GetBox(start, end);
+			_selectionRectangle.size = size;
+			_selectionRectangle.transform.position = origin;
+		}
+
+		public void ClearSelectionRectangle()
+		{
+			_selectionRectangle.size = Vector2.zero;
+		}
 	}
 }
