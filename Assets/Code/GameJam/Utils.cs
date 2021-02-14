@@ -49,6 +49,13 @@ namespace GameJam
 	        ;
         }
 
+        public static Character SpawnUnit(CharacterComponent prefab, string name, Vector3 position, Quaternion rotation)
+        {
+	        var component = GameObject.Instantiate(prefab, position, rotation);
+	        component.gameObject.name = name;
+	        return new Character { Name = name, Component = component, IsUnit = true };
+        }
+
         public static Character SpawnCharacter(CharacterComponent prefab, string name, Vector3 position, Quaternion rotation)
         {
 	        var component = GameObject.Instantiate(prefab, position, rotation);
@@ -77,6 +84,28 @@ namespace GameJam
 	        }
 
 	        return (origin, size);
+        }
+
+        public static void SelectCharacter(CharacterComponent character, bool value)
+        {
+	        if (character.Selection != null)
+	        {
+		        character.Selection.SetActive(value);
+	        }
+        }
+
+        public static void ShowCounter(CharacterComponent characterComponent, int count)
+        {
+	        if (characterComponent.DebugText != null)
+	        {
+		        characterComponent.DebugText.text = count.ToString();
+	        }
+        }
+
+        public static void MoveTo(Character character, Vector3 destination)
+        {
+	        var motion = (destination - character.Component.RootTransform.position).normalized;
+	        character.Component.CharacterController.Move(motion * (character.MoveSpeed * Time.deltaTime));
         }
 	}
 }

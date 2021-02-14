@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -10,22 +11,30 @@ namespace GameJam
 	{
 		public GameplayState(GameStateMachine machine, Game game) : base(machine, game) { }
 
+		private const float MIN_MOVE_DISTANCE = 1f;
+
 		public override async UniTask Enter()
 		{
 			await base.Enter();
 
 			_state.AllCharacters = new List<Character>();
 			_state.SelectedCharacters = new List<Character>();
-			var character1 = SpawnCharacter(_config.UnitPrefab, "Ariette", new Vector3(0f, 0f, 0f), Quaternion.identity);
+
+			var character1 = SpawnUnit(_config.UnitPrefab, "Ariette", new Vector3(0f, 0f, 0f), Quaternion.identity);
 			_state.AllCharacters.Add(character1);
-			var character2 = SpawnCharacter(_config.UnitPrefab, "Joe", new Vector3(3f, 2f, 0f), Quaternion.identity);
+			var character2 = SpawnUnit(_config.UnitPrefab, "Joe", new Vector3(3f, 2f, 0f), Quaternion.identity);
 			_state.AllCharacters.Add(character2);
-			var character3 = SpawnCharacter(_config.UnitPrefab, "Jessi", new Vector3(-5f, -2f, 0f), Quaternion.identity);
+			var character3 = SpawnUnit(_config.UnitPrefab, "Jessi", new Vector3(-5f, -2f, 0f), Quaternion.identity);
 			_state.AllCharacters.Add(character3);
+
+			var obstacle1 = SpawnCharacter(_config.ObstaclePrefab, "Obstacle1", new Vector3(9f, 7f, 0f), Quaternion.identity);
+			_state.AllCharacters.Add(obstacle1);
+			var obstacle2 = SpawnCharacter(_config.ObstaclePrefab, "Obstacle2", new Vector3(5f, -3f, 0f), Quaternion.identity);
+			_state.AllCharacters.Add(obstacle2);
 
 			foreach (var character in _state.AllCharacters)
 			{
-				character.Component.Selection.SetActive(false);
+				SelectCharacter(character.Component, false);
 			}
 
 			_ui.ShowGameplay();
@@ -54,10 +63,24 @@ namespace GameJam
 
 			foreach (var character in _state.AllCharacters)
 			{
+				// TODO: optimize this
+				ShowCounter(character.Component, _state.AllCharacters.Count(
+					c => c.ActionTarget == character && Vector3.Distance(c.Component.RootTransform.position, c.MoveDestination) < MIN_MOVE_DISTANCE)
+				);
+
 				if (character.NeedsToMove)
 				{
-					var motion = (character.MoveDestination - character.Component.RootTransform.position).normalized;
-					character.Component.CharacterController.Move(motion * (character.MoveSpeed * Time.deltaTime));
+					MoveTo(character, character.MoveDestination);
+
+					if (Vector3.Distance(character.Component.RootTransform.position, character.MoveDestination) < MIN_MOVE_DISTANCE)
+					{
+						character.NeedsToMove = false;
+					}
+				}
+
+				if (character.NeedsToMove == false && character.ActionTarget != null)
+				{
+					// Debug.Log(character.Name + " interacting with " + character.ActionTarget.Name);
 				}
 			}
 
@@ -100,7 +123,7 @@ namespace GameJam
 		{
 			foreach (var character in _state.SelectedCharacters)
 			{
-				character.Component.Selection.SetActive(false);
+				SelectCharacter(character.Component, false);
 			}
 
 			_state.SelectedCharacters = new List<Character>();
@@ -110,11 +133,12 @@ namespace GameJam
 			var hits = Physics2D.BoxCastAll(origin, new Vector2(Mathf.Abs(size.x), Mathf.Abs(size.y)), 0f, Vector2.zero);
 			foreach (var hit in hits)
 			{
-				var character = hit.transform.GetComponentInParent<CharacterComponent>();
-				if (character != null)
+				var component = hit.transform.GetComponentInParent<CharacterComponent>();
+				var character = GetCharacter(component);
+				if (character?.IsUnit == true)
 				{
-					_state.SelectedCharacters.Add(GetCharacter(character));
-					character.Selection.SetActive(true);
+					_state.SelectedCharacters.Add(character);
+					SelectCharacter(component, true);
 				}
 			}
 
@@ -123,32 +147,37 @@ namespace GameJam
 
 		private void OnCancelReleased(InputAction.CallbackContext obj)
 		{
+			var mousePosition = _controls.Gameplay.MousePosition.ReadValue<Vector2>();
+			var mouseWorldPosition = _camera.ScreenToWorldPoint(mousePosition);
+			mouseWorldPosition.z = 0f;
+
 			foreach (var character in _state.SelectedCharacters)
 			{
-				SetOrder(character, 1);
+				OrderAtPosition(character, mouseWorldPosition);
 			}
 		}
 
-		private void SetOrder(Character character, int order)
+		private void OrderAtPosition(Character character, Vector3 destination)
 		{
-			switch (order)
+			if (Vector3.Distance(character.Component.RootTransform.position, destination) > MIN_MOVE_DISTANCE)
 			{
-				case 1:
-				{
-					var mousePosition = _controls.Gameplay.MousePosition.ReadValue<Vector2>();
-					var mouseWorldPosition = _camera.ScreenToWorldPoint(mousePosition);
-					mouseWorldPosition.z = 0f;
+				character.NeedsToMove = true;
+				character.MoveDestination = destination;
+			}
 
-					Debug.Log(character.Name + " move to " + mouseWorldPosition);
-					character.NeedsToMove = true;
-					character.MoveDestination = mouseWorldPosition;
-				}
-				break;
-				default:
+			var hit = Physics2D.CircleCast(destination, 0.5f, Vector2.zero);
+			if (hit.collider)
+			{
+				var targetComponent = hit.transform.GetComponentInParent<CharacterComponent>();
+				var targetCharacter = GetCharacter(targetComponent);
+				if (targetCharacter?.IsUnit == false)
 				{
-					Debug.LogError("Unknown order: " + order);
+					character.ActionTarget = targetCharacter;
 				}
-				break;
+			}
+			else
+			{
+				character.ActionTarget = null;
 			}
 		}
 
