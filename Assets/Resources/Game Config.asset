@@ -13,3 +13,4 @@ MonoBehaviour:
   m_Name: Game Config
   m_EditorClassIdentifier: 
   UnitPrefab: {fileID: 4246819502291371097, guid: d382ce520e6d21641b1264655066cf76, type: 3}
+  ObstaclePrefab: {fileID: 2218516013654545810, guid: 81e71b9986a295442ba62c7324fb3f2d, type: 3}

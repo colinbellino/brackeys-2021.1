@@ -6,5 +6,6 @@ namespace GameJam
 	public class GameConfig : ScriptableObject
 	{
 		public CharacterComponent UnitPrefab;
+		public CharacterComponent ObstaclePrefab;
 	}
 }
