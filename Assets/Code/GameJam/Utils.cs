@@ -7,7 +7,7 @@ namespace GameJam
 {
 	public static class Utils
 	{
-		public static Game GetGameInstance()
+		public static Game FindGameInstance()
 		{
 			var manager = GameObject.FindObjectOfType<GameManager>();
 			if (manager == null)
@@ -17,40 +17,6 @@ namespace GameJam
 
 			return manager.Game;
 		}
-
-		public static void Look(Character character, Camera camera, Vector2 lookInput, float sensitivity, float step)
-		{
-			var look = lookInput * (sensitivity * step);
-
-			character.RotationX -= look.y;
-			character.RotationX = Mathf.Clamp(character.RotationX, -90f, 90f);
-
-			character.Component.HeadTransform.localRotation = Quaternion.Euler(character.RotationX, 0f, 0f);
-			character.Component.RootTransform.Rotate(Vector3.up, look.x);
-		}
-
-		public static void Move(Character character, Vector2 moveInput, float speed, float gravityModifier, float step)
-        {
-            if (character.IsGrounded)
-            {
-                character.Velocity = Vector3.zero;
-            }
-
-            var move = (character.Component.RootTransform.forward * moveInput.y + character.Component.RootTransform.right * moveInput.x);
-            character.Component.CharacterController.Move(move * (speed * step));
-
-            character.Velocity += Physics.gravity * (gravityModifier * step * step);
-            character.Component.CharacterController.Move(character.Velocity);
-        }
-
-        public static void UpdateIsGrounded(Character character, LayerMask groundCheckMask)
-        {
-            character.IsGrounded = Physics.CheckSphere(
-                character.Component.GroundCheck.position,
-                character.Component.GroundCheckRadius,
-        		groundCheckMask
-            );
-        }
 
         public static void Follow(Transform follower, Transform target)
         {
@@ -99,10 +65,16 @@ namespace GameJam
 	        return false;
         }
 
-        public static (Vector3, Vector3) GetBox(Vector3 start, Vector3 end)
+        public static (Vector3, Vector3) GetSelectionBox(Vector3 start, Vector3 end)
         {
 	        var size = new Vector3(end.x - start.x, end.y - start.y, 1f);
 	        var origin = new Vector3(start.x + size.x / 2f, start.y + size.y / 2f, 0f);
+
+	        if (start == end)
+	        {
+		        size.x = 0.1f;
+		        size.y = 0.1f;
+	        }
 
 	        return (origin, size);
         }
