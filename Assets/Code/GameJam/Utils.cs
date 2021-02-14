@@ -18,49 +18,18 @@ namespace GameJam
 			return manager.Game;
 		}
 
-        public static void Follow(Transform follower, Transform target)
+        public static Entity SpawnUnit(CharacterComponent prefab, string name, Vector3 position)
         {
-	        follower.position = target.position;
-	        follower.rotation = target.rotation;
-        }
-
-        public static CharacterComponent GetCharacterPointedAt(Camera camera, float maxDistance, LayerMask interactionMask)
-        {
-	        var didHit = Physics.Raycast(
-		        camera.transform.position, camera.transform.forward,
-		        out var hit, maxDistance, interactionMask
-	        );
-	        if (didHit)
-	        {
-		        return hit.collider.GetComponentInParent<CharacterComponent>();
-	        }
-
-	        return null;
-        }
-
-        public static async UniTask AnimatePet(Transform transform)
-        {
-	        var originalRotation = transform.rotation;
-
-			await DOTween.Sequence()
-		        .Append(transform.DORotateQuaternion(originalRotation * Quaternion.Euler(new Vector3(-20f, 0f, 0f)), 0.2f))
-		        .Append(transform.DORotateQuaternion(originalRotation, 0.1f))
-		        .SetLoops(3)
-	        ;
-        }
-
-        public static Character SpawnUnit(CharacterComponent prefab, string name, Vector3 position, Quaternion rotation)
-        {
-	        var component = GameObject.Instantiate(prefab, position, rotation);
+	        var component = GameObject.Instantiate(prefab, position, Quaternion.identity);
 	        component.gameObject.name = name;
-	        return new Character { Name = name, Component = component, IsUnit = true };
+	        return new Entity { Name = name, Component = component, Type = Entity.Types.Unit };
         }
 
-        public static Character SpawnCharacter(CharacterComponent prefab, string name, Vector3 position, Quaternion rotation)
+        public static Entity SpawnObstacle(CharacterComponent prefab, string name, Vector3 position, int requiredUnits, int duration, Vector3 destination)
         {
-	        var component = GameObject.Instantiate(prefab, position, rotation);
+	        var component = GameObject.Instantiate(prefab, position, Quaternion.identity);
 	        component.gameObject.name = name;
-	        return new Character { Name = name, Component = component };
+	        return new Entity { Name = name, Component = component, Type = Entity.Types.Obstacle, RequiredUnits = requiredUnits, Duration = duration, ObstacleDestination = destination};
         }
 
         public static bool IsDevBuild()
@@ -94,18 +63,18 @@ namespace GameJam
 	        }
         }
 
-        public static void ShowCounter(CharacterComponent characterComponent, int count)
+        public static void SetDebugText(CharacterComponent characterComponent, string value)
         {
 	        if (characterComponent.DebugText != null)
 	        {
-		        characterComponent.DebugText.text = count.ToString();
+		        characterComponent.DebugText.text = value;
 	        }
         }
 
-        public static void MoveTo(Character character, Vector3 destination)
+        public static void MoveTowards(Entity entity, Vector3 destination, float step)
         {
-	        var motion = (destination - character.Component.RootTransform.position).normalized;
-	        character.Component.CharacterController.Move(motion * (character.MoveSpeed * Time.deltaTime));
+	        var motion = (destination - entity.Component.RootTransform.position).normalized;
+	        entity.Component.CharacterController.Move(motion * step);
         }
 	}
 }

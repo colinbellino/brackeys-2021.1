@@ -17,24 +17,25 @@ namespace GameJam
 		{
 			await base.Enter();
 
-			_state.AllCharacters = new List<Character>();
-			_state.SelectedCharacters = new List<Character>();
+			_state.Entities = new List<Entity>();
+			_state.SelectedUnits = new List<Entity>();
 
-			var character1 = SpawnUnit(_config.UnitPrefab, "Ariette", new Vector3(0f, 0f, 0f), Quaternion.identity);
-			_state.AllCharacters.Add(character1);
-			var character2 = SpawnUnit(_config.UnitPrefab, "Joe", new Vector3(3f, 2f, 0f), Quaternion.identity);
-			_state.AllCharacters.Add(character2);
-			var character3 = SpawnUnit(_config.UnitPrefab, "Jessi", new Vector3(-5f, -2f, 0f), Quaternion.identity);
-			_state.AllCharacters.Add(character3);
+			var character1 = SpawnUnit(_config.UnitPrefab, "Ariette", new Vector3(0f, 0f, 0f));
+			_state.Entities.Add(character1);
+			var character2 = SpawnUnit(_config.UnitPrefab, "Joe", new Vector3(3f, 2f, 0f));
+			_state.Entities.Add(character2);
+			var character3 = SpawnUnit(_config.UnitPrefab, "Jessi", new Vector3(-5f, -2f, 0f));
+			_state.Entities.Add(character3);
 
-			var obstacle1 = SpawnCharacter(_config.ObstaclePrefab, "Obstacle1", new Vector3(9f, 7f, 0f), Quaternion.identity);
-			_state.AllCharacters.Add(obstacle1);
-			var obstacle2 = SpawnCharacter(_config.ObstaclePrefab, "Obstacle2", new Vector3(5f, -3f, 0f), Quaternion.identity);
-			_state.AllCharacters.Add(obstacle2);
+			var obstacle1 = SpawnObstacle(_config.ObstaclePrefab, "Obstacle1", new Vector3(9f, 7f, 0f), 2, 2, new Vector3(11f, 7f, 0f));
+			_state.Entities.Add(obstacle1);
+			var obstacle2 = SpawnObstacle(_config.ObstaclePrefab, "Obstacle2", new Vector3(5f, -3f, 0f), 1, 2, new Vector3(5f, -1f, 0f));
+			_state.Entities.Add(obstacle2);
 
-			foreach (var character in _state.AllCharacters)
+			foreach (var character in _state.Entities)
 			{
 				SelectCharacter(character.Component, false);
+				SetDebugText(character.Component, "");
 			}
 
 			_ui.ShowGameplay();
@@ -61,30 +62,59 @@ namespace GameJam
 		{
 			base.Tick();
 
-			foreach (var character in _state.AllCharacters)
+			foreach (var entity in _state.Units)
 			{
-				// TODO: optimize this
-				ShowCounter(character.Component, _state.AllCharacters.Count(
-					c => c.ActionTarget == character && Vector3.Distance(c.Component.RootTransform.position, c.MoveDestination) < MIN_MOVE_DISTANCE)
-				);
-
-				if (character.NeedsToMove)
+				switch (entity.State)
 				{
-					MoveTo(character, character.MoveDestination);
-
-					if (Vector3.Distance(character.Component.RootTransform.position, character.MoveDestination) < MIN_MOVE_DISTANCE)
+					case Entity.States.Moving:
 					{
-						character.NeedsToMove = false;
-					}
-				}
+						MoveTowards(entity, entity.MoveDestination, entity.MoveSpeed * Time.deltaTime);
 
-				if (character.NeedsToMove == false && character.ActionTarget != null)
-				{
-					// Debug.Log(character.Name + " interacting with " + character.ActionTarget.Name);
+						if (Vector3.Distance(entity.Component.RootTransform.position, entity.MoveDestination) < MIN_MOVE_DISTANCE)
+						{
+							entity.State = Entity.States.Acting;
+						}
+					} break;
+
+					case Entity.States.Acting:
+					{
+						if (entity.ActionTarget != null)
+						{
+							// Debug.Log(entity.Name + " interacting with " + entity.ActionTarget.Name);
+						}
+					} break;
 				}
 			}
 
-			if (_state.SelectionInProgress)
+			foreach (var entity in _state.Obstacles)
+			{
+				var count = _state.Entities.Count(c => c.ActionTarget == entity && c.State == Entity.States.Acting);
+				SetDebugText(entity.Component, $"{entity.State}\n{count}/{entity.RequiredUnits}");
+
+				switch (entity.State)
+				{
+					case Entity.States.Idle:
+					{
+						if (count >= entity.RequiredUnits)
+						{
+							entity.State = Entity.States.Moving;
+						}
+					} break;
+
+					case Entity.States.Moving:
+					{
+						MoveTowards(entity, entity.ObstacleDestination, entity.Progress / entity.Duration);
+						entity.Progress += Time.deltaTime;
+
+						if (entity.Progress > entity.Duration)
+						{
+							entity.State = Entity.States.Inactive;
+						}
+					} break;
+				}
+			}
+
+			if (_state.IsSelectionInProgress)
 			{
 				var mousePosition = _controls.Gameplay.MousePosition.ReadValue<Vector2>();
 				var mouseWorldPosition = _camera.ScreenToWorldPoint(mousePosition);
@@ -115,34 +145,34 @@ namespace GameJam
 			var mousePosition = _controls.Gameplay.MousePosition.ReadValue<Vector2>();
 			var mouseWorldPosition = _camera.ScreenToWorldPoint(mousePosition);
 
-			_state.SelectionInProgress = true;
+			_state.IsSelectionInProgress = true;
 			_state.SelectionStart = mouseWorldPosition;
 		}
 
 		private void OnConfirmReleased(InputAction.CallbackContext obj)
 		{
-			foreach (var character in _state.SelectedCharacters)
+			foreach (var character in _state.SelectedUnits)
 			{
 				SelectCharacter(character.Component, false);
 			}
 
-			_state.SelectedCharacters = new List<Character>();
-			_state.SelectionInProgress = false;
+			_state.SelectedUnits = new List<Entity>();
+			_state.IsSelectionInProgress = false;
 
 			var (origin, size) = GetSelectionBox(_state.SelectionStart, _state.SelectionEnd);
 			var hits = Physics2D.BoxCastAll(origin, new Vector2(Mathf.Abs(size.x), Mathf.Abs(size.y)), 0f, Vector2.zero);
 			foreach (var hit in hits)
 			{
-				var component = hit.transform.GetComponentInParent<CharacterComponent>();
-				var character = GetCharacter(component);
-				if (character?.IsUnit == true)
+				var entityComponent = hit.transform.GetComponentInParent<CharacterComponent>();
+				var entity = GetEntity(entityComponent);
+				if (entity?.Type == Entity.Types.Unit)
 				{
-					_state.SelectedCharacters.Add(character);
-					SelectCharacter(component, true);
+					_state.SelectedUnits.Add(entity);
+					SelectCharacter(entityComponent, true);
 				}
 			}
 
-			_ui.SelectSelectedCharacters(_state.SelectedCharacters);
+			_ui.SelectSelectedCharacters(_state.SelectedUnits);
 		}
 
 		private void OnCancelReleased(InputAction.CallbackContext obj)
@@ -151,39 +181,39 @@ namespace GameJam
 			var mouseWorldPosition = _camera.ScreenToWorldPoint(mousePosition);
 			mouseWorldPosition.z = 0f;
 
-			foreach (var character in _state.SelectedCharacters)
+			foreach (var character in _state.SelectedUnits)
 			{
 				OrderAtPosition(character, mouseWorldPosition);
 			}
 		}
 
-		private void OrderAtPosition(Character character, Vector3 destination)
+		private void OrderAtPosition(Entity entity, Vector3 destination)
 		{
-			if (Vector3.Distance(character.Component.RootTransform.position, destination) > MIN_MOVE_DISTANCE)
+			if (Vector3.Distance(entity.Component.RootTransform.position, destination) > MIN_MOVE_DISTANCE)
 			{
-				character.NeedsToMove = true;
-				character.MoveDestination = destination;
+				entity.State = Entity.States.Moving;
+				entity.MoveDestination = destination;
 			}
 
 			var hit = Physics2D.CircleCast(destination, 0.5f, Vector2.zero);
 			if (hit.collider)
 			{
 				var targetComponent = hit.transform.GetComponentInParent<CharacterComponent>();
-				var targetCharacter = GetCharacter(targetComponent);
-				if (targetCharacter?.IsUnit == false)
+				var targetCharacter = GetEntity(targetComponent);
+				if (targetCharacter?.Type == Entity.Types.Obstacle)
 				{
-					character.ActionTarget = targetCharacter;
+					entity.ActionTarget = targetCharacter;
 				}
 			}
 			else
 			{
-				character.ActionTarget = null;
+				entity.ActionTarget = null;
 			}
 		}
 
-		private Character GetCharacter(CharacterComponent component)
+		private Entity GetEntity(CharacterComponent component)
 		{
-			return _state.AllCharacters.Find(character => character.Component == component);
+			return _state.Entities.Find(character => character.Component == component);
 		}
 	}
 }

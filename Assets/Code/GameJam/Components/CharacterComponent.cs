@@ -12,16 +12,26 @@ namespace GameJam
 		[SerializeField] public Text DebugText;
 	}
 
-	public class Character
+	public class Entity
 	{
 		public string Name;
+		public Types Type;
+		public CharacterComponent Component;
+
+		// Units
 		public float MoveSpeed = 5f;
 		public Vector3 MoveDestination;
-		public Character ActionTarget;
-		public bool NeedsToMove;
-		public bool IsUnit;
+		public Entity ActionTarget;
+		public States State;
 
-		public CharacterComponent Component { get; set; }
+		// Obstacles
+		public int RequiredUnits;
+		public float Duration;
+		public float Progress;
+		public Vector3 ObstacleDestination;
+
+		public enum Types { None, Unit, Obstacle }
+		public enum States { Idle, Moving, Acting, Inactive }
 
 		public override string ToString() => Name;
 	}
