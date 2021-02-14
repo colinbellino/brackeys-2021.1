@@ -12,7 +12,7 @@ namespace GameJam
 
 		private void Start()
 		{
-			_game = GetGameInstance();
+			_game = FindGameInstance();
 			_rotationOffset = _toRotate.rotation;
 		}
 

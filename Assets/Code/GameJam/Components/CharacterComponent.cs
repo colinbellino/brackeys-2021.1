@@ -7,19 +7,17 @@ namespace GameJam
 	{
 		[SerializeField] public CharacterController CharacterController;
 		[SerializeField] public Transform RootTransform;
-		[SerializeField] public Transform HeadTransform;
 		[SerializeField] public Transform GroundCheck;
 		[SerializeField] public float GroundCheckRadius = 0.4f;
+		[SerializeField] public GameObject Selection;
 	}
 
 	public class Character
 	{
-		public string Name { get; set; }
-		public float RotationX { get; set; }
-		public Vector3 Velocity { get; set; }
-		public bool IsGrounded { get; set; }
-		public bool IsBusy { get; set; }
-		public bool WasPetted { get; set; }
+		public string Name;
+		public float MoveSpeed = 10f;
+		public Vector3 MoveDestination;
+		public bool NeedsToMove;
 
 		public CharacterComponent Component { get; set; }
 	}

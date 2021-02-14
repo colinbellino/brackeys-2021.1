@@ -23,11 +23,17 @@ namespace GameJam
 			var character3 = SpawnCharacter(_config.UnitPrefab, "Jessi", new Vector3(-5f, -2f, 0f), Quaternion.identity);
 			_state.AllCharacters.Add(character3);
 
+			foreach (var character in _state.AllCharacters)
+			{
+				character.Component.Selection.SetActive(false);
+			}
+
 			_ui.ShowGameplay();
 
 			_controls.Gameplay.Enable();
 			_controls.Gameplay.ConfirmPress.performed += OnConfirmPressed;
 			_controls.Gameplay.Confirm.performed += OnConfirmReleased;
+			_controls.Gameplay.Cancel.performed += OnCancelReleased;
 		}
 
 		public override async UniTask Exit()
@@ -39,11 +45,21 @@ namespace GameJam
 			_controls.Gameplay.Disable();
 			_controls.Gameplay.ConfirmPress.performed -= OnConfirmPressed;
 			_controls.Gameplay.Confirm.performed -= OnConfirmReleased;
+			_controls.Gameplay.Cancel.performed -= OnCancelReleased;
 		}
 
 		public override void Tick()
 		{
 			base.Tick();
+
+			foreach (var character in _state.AllCharacters)
+			{
+				if (character.NeedsToMove)
+				{
+					var motion = (character.MoveDestination - character.Component.RootTransform.position).normalized;
+					character.Component.CharacterController.Move(motion * (character.MoveSpeed * Time.deltaTime));
+				}
+			}
 
 			if (_state.SelectionInProgress)
 			{
@@ -82,22 +98,58 @@ namespace GameJam
 
 		private void OnConfirmReleased(InputAction.CallbackContext obj)
 		{
+			foreach (var character in _state.SelectedCharacters)
+			{
+				character.Component.Selection.SetActive(false);
+			}
+
 			_state.SelectedCharacters = new List<Character>();
 			_state.SelectionInProgress = false;
 
-			var (origin, size) = GetBox(_state.SelectionStart, _state.SelectionEnd);
+			var (origin, size) = GetSelectionBox(_state.SelectionStart, _state.SelectionEnd);
 			var hits = Physics2D.BoxCastAll(origin, new Vector2(Mathf.Abs(size.x), Mathf.Abs(size.y)), 0f, Vector2.zero);
 			foreach (var hit in hits)
 			{
 				var character = hit.transform.GetComponentInParent<CharacterComponent>();
 				if (character != null)
 				{
-					Debug.Log("hit : " + character.name);
 					_state.SelectedCharacters.Add(GetCharacter(character));
+					character.Selection.SetActive(true);
 				}
 			}
 
 			_ui.SelectSelectedCharacters(_state.SelectedCharacters);
+		}
+
+		private void OnCancelReleased(InputAction.CallbackContext obj)
+		{
+			foreach (var character in _state.SelectedCharacters)
+			{
+				SetOrder(character, 1);
+			}
+		}
+
+		private void SetOrder(Character character, int order)
+		{
+			switch (order)
+			{
+				case 1:
+				{
+					var mousePosition = _controls.Gameplay.MousePosition.ReadValue<Vector2>();
+					var mouseWorldPosition = _camera.ScreenToWorldPoint(mousePosition);
+					mouseWorldPosition.z = 0f;
+
+					Debug.Log(character.Name + " move to " + mouseWorldPosition);
+					character.NeedsToMove = true;
+					character.MoveDestination = mouseWorldPosition;
+				}
+				break;
+				default:
+				{
+					Debug.LogError("Unknown order: " + order);
+				}
+				break;
+			}
 		}
 
 		private Character GetCharacter(CharacterComponent component)

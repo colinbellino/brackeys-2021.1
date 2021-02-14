@@ -56,7 +56,7 @@ namespace GameJam
 
 		public void SetSelectionRectangle(Vector3 start, Vector3 end)
 		{
-			var (origin, size) = GetBox(start, end);
+			var (origin, size) = GetSelectionBox(start, end);
 			_selectionRectangle.size = size;
 			_selectionRectangle.transform.position = origin;
 		}
