@@ -62,6 +62,14 @@ public class @GameControls : IInputActionCollection, IDisposable
                     ""interactions"": ""Press(behavior=1)""
                 },
                 {
+                    ""name"": ""ConfirmPress"",
+                    ""type"": ""Button"",
+                    ""id"": ""423e6e66-ff79-4c86-b6a3-08fb760f8c8f"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": ""Press""
+                },
+                {
                     ""name"": ""Cancel"",
                     ""type"": ""Button"",
                     ""id"": ""c34bc2a5-f988-403c-a49c-63a70f076efa"",
@@ -73,14 +81,6 @@ public class @GameControls : IInputActionCollection, IDisposable
                     ""name"": ""Mouse Position"",
                     ""type"": ""Value"",
                     ""id"": ""5f88aa2d-5d18-4935-bd3e-c1dec0958914"",
-                    ""expectedControlType"": ""Vector2"",
-                    ""processors"": """",
-                    ""interactions"": """"
-                },
-                {
-                    ""name"": ""Look"",
-                    ""type"": ""Value"",
-                    ""id"": ""1e495ea8-cb9a-4c6b-a6bd-cc7ebf9b96ba"",
                     ""expectedControlType"": ""Vector2"",
                     ""processors"": """",
                     ""interactions"": """"
@@ -265,12 +265,34 @@ public class @GameControls : IInputActionCollection, IDisposable
                 },
                 {
                     ""name"": """",
-                    ""id"": ""aea2d6f8-d5f5-47f5-87e7-91f076186292"",
-                    ""path"": ""<Mouse>/delta"",
+                    ""id"": ""59439cc3-7da9-433c-a406-4469cab503bb"",
+                    ""path"": ""<Keyboard>/enter"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Look"",
+                    ""action"": ""ConfirmPress"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""b34a233c-c4a6-445d-85ec-586663ca5bbb"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ConfirmPress"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a6e27f53-8782-405b-8f65-2ac05d70cf46"",
+                    ""path"": ""<Keyboard>/space"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ConfirmPress"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -286,9 +308,9 @@ public class @GameControls : IInputActionCollection, IDisposable
         m_Gameplay = asset.FindActionMap("Gameplay", throwIfNotFound: true);
         m_Gameplay_Move = m_Gameplay.FindAction("Move", throwIfNotFound: true);
         m_Gameplay_Confirm = m_Gameplay.FindAction("Confirm", throwIfNotFound: true);
+        m_Gameplay_ConfirmPress = m_Gameplay.FindAction("ConfirmPress", throwIfNotFound: true);
         m_Gameplay_Cancel = m_Gameplay.FindAction("Cancel", throwIfNotFound: true);
         m_Gameplay_MousePosition = m_Gameplay.FindAction("Mouse Position", throwIfNotFound: true);
-        m_Gameplay_Look = m_Gameplay.FindAction("Look", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -373,18 +395,18 @@ public class @GameControls : IInputActionCollection, IDisposable
     private IGameplayActions m_GameplayActionsCallbackInterface;
     private readonly InputAction m_Gameplay_Move;
     private readonly InputAction m_Gameplay_Confirm;
+    private readonly InputAction m_Gameplay_ConfirmPress;
     private readonly InputAction m_Gameplay_Cancel;
     private readonly InputAction m_Gameplay_MousePosition;
-    private readonly InputAction m_Gameplay_Look;
     public struct GameplayActions
     {
         private @GameControls m_Wrapper;
         public GameplayActions(@GameControls wrapper) { m_Wrapper = wrapper; }
         public InputAction @Move => m_Wrapper.m_Gameplay_Move;
         public InputAction @Confirm => m_Wrapper.m_Gameplay_Confirm;
+        public InputAction @ConfirmPress => m_Wrapper.m_Gameplay_ConfirmPress;
         public InputAction @Cancel => m_Wrapper.m_Gameplay_Cancel;
         public InputAction @MousePosition => m_Wrapper.m_Gameplay_MousePosition;
-        public InputAction @Look => m_Wrapper.m_Gameplay_Look;
         public InputActionMap Get() { return m_Wrapper.m_Gameplay; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -400,15 +422,15 @@ public class @GameControls : IInputActionCollection, IDisposable
                 @Confirm.started -= m_Wrapper.m_GameplayActionsCallbackInterface.OnConfirm;
                 @Confirm.performed -= m_Wrapper.m_GameplayActionsCallbackInterface.OnConfirm;
                 @Confirm.canceled -= m_Wrapper.m_GameplayActionsCallbackInterface.OnConfirm;
+                @ConfirmPress.started -= m_Wrapper.m_GameplayActionsCallbackInterface.OnConfirmPress;
+                @ConfirmPress.performed -= m_Wrapper.m_GameplayActionsCallbackInterface.OnConfirmPress;
+                @ConfirmPress.canceled -= m_Wrapper.m_GameplayActionsCallbackInterface.OnConfirmPress;
                 @Cancel.started -= m_Wrapper.m_GameplayActionsCallbackInterface.OnCancel;
                 @Cancel.performed -= m_Wrapper.m_GameplayActionsCallbackInterface.OnCancel;
                 @Cancel.canceled -= m_Wrapper.m_GameplayActionsCallbackInterface.OnCancel;
                 @MousePosition.started -= m_Wrapper.m_GameplayActionsCallbackInterface.OnMousePosition;
                 @MousePosition.performed -= m_Wrapper.m_GameplayActionsCallbackInterface.OnMousePosition;
                 @MousePosition.canceled -= m_Wrapper.m_GameplayActionsCallbackInterface.OnMousePosition;
-                @Look.started -= m_Wrapper.m_GameplayActionsCallbackInterface.OnLook;
-                @Look.performed -= m_Wrapper.m_GameplayActionsCallbackInterface.OnLook;
-                @Look.canceled -= m_Wrapper.m_GameplayActionsCallbackInterface.OnLook;
             }
             m_Wrapper.m_GameplayActionsCallbackInterface = instance;
             if (instance != null)
@@ -419,15 +441,15 @@ public class @GameControls : IInputActionCollection, IDisposable
                 @Confirm.started += instance.OnConfirm;
                 @Confirm.performed += instance.OnConfirm;
                 @Confirm.canceled += instance.OnConfirm;
+                @ConfirmPress.started += instance.OnConfirmPress;
+                @ConfirmPress.performed += instance.OnConfirmPress;
+                @ConfirmPress.canceled += instance.OnConfirmPress;
                 @Cancel.started += instance.OnCancel;
                 @Cancel.performed += instance.OnCancel;
                 @Cancel.canceled += instance.OnCancel;
                 @MousePosition.started += instance.OnMousePosition;
                 @MousePosition.performed += instance.OnMousePosition;
                 @MousePosition.canceled += instance.OnMousePosition;
-                @Look.started += instance.OnLook;
-                @Look.performed += instance.OnLook;
-                @Look.canceled += instance.OnLook;
             }
         }
     }
@@ -440,8 +462,8 @@ public class @GameControls : IInputActionCollection, IDisposable
     {
         void OnMove(InputAction.CallbackContext context);
         void OnConfirm(InputAction.CallbackContext context);
+        void OnConfirmPress(InputAction.CallbackContext context);
         void OnCancel(InputAction.CallbackContext context);
         void OnMousePosition(InputAction.CallbackContext context);
-        void OnLook(InputAction.CallbackContext context);
     }
 }

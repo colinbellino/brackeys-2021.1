@@ -44,3 +44,6 @@ TagManager:
   - name: SFX
     uniqueID: 995917501
     locked: 0
+  - name: UI
+    uniqueID: 2566642627
+    locked: 0

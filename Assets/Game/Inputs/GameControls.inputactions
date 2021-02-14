@@ -49,6 +49,14 @@
                     "interactions": "Press(behavior=1)"
                 },
                 {
+                    "name": "ConfirmPress",
+                    "type": "Button",
+                    "id": "423e6e66-ff79-4c86-b6a3-08fb760f8c8f",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "Press"
+                },
+                {
                     "name": "Cancel",
                     "type": "Button",
                     "id": "c34bc2a5-f988-403c-a49c-63a70f076efa",
@@ -60,14 +68,6 @@
                     "name": "Mouse Position",
                     "type": "Value",
                     "id": "5f88aa2d-5d18-4935-bd3e-c1dec0958914",
-                    "expectedControlType": "Vector2",
-                    "processors": "",
-                    "interactions": ""
-                },
-                {
-                    "name": "Look",
-                    "type": "Value",
-                    "id": "1e495ea8-cb9a-4c6b-a6bd-cc7ebf9b96ba",
                     "expectedControlType": "Vector2",
                     "processors": "",
                     "interactions": ""
@@ -252,12 +252,34 @@
                 },
                 {
                     "name": "",
-                    "id": "aea2d6f8-d5f5-47f5-87e7-91f076186292",
-                    "path": "<Mouse>/delta",
+                    "id": "59439cc3-7da9-433c-a406-4469cab503bb",
+                    "path": "<Keyboard>/enter",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Look",
+                    "action": "ConfirmPress",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "b34a233c-c4a6-445d-85ec-586663ca5bbb",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ConfirmPress",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "a6e27f53-8782-405b-8f65-2ac05d70cf46",
+                    "path": "<Keyboard>/space",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ConfirmPress",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
