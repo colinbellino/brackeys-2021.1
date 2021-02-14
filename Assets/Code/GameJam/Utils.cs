@@ -95,6 +95,8 @@ namespace GameJam
 			#if UNITY_EDITOR
 		        return true;
 	        #endif
+
+	        return false;
         }
 	}
 }
