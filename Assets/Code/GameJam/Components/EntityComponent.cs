@@ -8,10 +8,10 @@ namespace GameJam
 	public class EntityComponent : MonoBehaviour
 	{
 		[SerializeField] public Transform RootTransform;
-		[SerializeField] public CharacterController CharacterController;
 		[SerializeField] public GameObject Selection;
 		[SerializeField] public Text DebugText;
 		[SerializeField] public AIPath AI;
+		[SerializeField] public Rigidbody2D Rigidbody;
 	}
 
 	public class Entity
@@ -21,7 +21,6 @@ namespace GameJam
 		public EntityComponent Component;
 
 		// Units
-		public float MoveSpeed = 5f;
 		public Vector3 MoveDestination;
 		public Entity ActionTarget;
 		public States State;

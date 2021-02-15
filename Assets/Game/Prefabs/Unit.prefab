@@ -71,7 +71,7 @@ SpriteRenderer:
   m_SortingLayerID: 1463812865
   m_SortingLayer: 1
   m_SortingOrder: 1
-  m_Sprite: {fileID: -7050129638846038990, guid: 5f4b387cd2189724e94fd2184aa1048b, type: 3}
+  m_Sprite: {fileID: -5299290394003386284, guid: 8a3373f8383d4c441866e07bc3ca56cd, type: 3}
   m_Color: {r: 1, g: 0, b: 0, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -190,7 +190,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4246819502291371096}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &1678978108747554879
 SpriteRenderer:
@@ -254,7 +254,7 @@ GameObject:
   - component: {fileID: 6752205568628990139}
   - component: {fileID: 2199988503468643605}
   m_Layer: 0
-  m_Name: Collider
+  m_Name: Physics Collider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -323,6 +323,7 @@ Transform:
   m_Children:
   - {fileID: 3937556886654042465}
   - {fileID: 6752205568628990139}
+  - {fileID: 4981806554422630568}
   - {fileID: 1181987965289384886}
   - {fileID: 5963964419190044174}
   m_Father: {fileID: 0}
@@ -341,10 +342,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   RootTransform: {fileID: 4246819502291371096}
-  CharacterController: {fileID: 0}
   Selection: {fileID: 3545214118591375296}
   DebugText: {fileID: 790623453166190220}
   AI: {fileID: 3804279367249017531}
+  Rigidbody: {fileID: 305933623984123124}
 --- !u!114 &2024294579434045807
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -391,7 +392,7 @@ MonoBehaviour:
   repathRate: 0.1
   canSearch: 1
   canMove: 1
-  maxSpeed: 3
+  maxSpeed: 6
   gravity: {x: 0, y: 0, z: 0}
   groundMask:
     serializedVersion: 2
@@ -421,7 +422,7 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 100
+  m_Mass: 1000
   m_LinearDrag: 0
   m_AngularDrag: 0.05
   m_GravityScale: 0
@@ -462,7 +463,7 @@ RectTransform:
   m_Children:
   - {fileID: 3608712552418582850}
   m_Father: {fileID: 4246819502291371096}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -530,6 +531,53 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!1 &6377974971175957370
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4981806554422630568}
+  - component: {fileID: 6963174488044427392}
+  m_Layer: 7
+  m_Name: Interaction Collider
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4981806554422630568
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6377974971175957370}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 4246819502291371096}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!58 &6963174488044427392
+CircleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6377974971175957370}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  serializedVersion: 2
+  m_Radius: 1
 --- !u!1 &8013746561072375857
 GameObject:
   m_ObjectHideFlags: 0

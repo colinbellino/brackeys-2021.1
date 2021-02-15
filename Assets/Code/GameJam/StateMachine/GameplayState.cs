@@ -20,6 +20,8 @@ namespace GameJam
 			_state.Entities = new List<Entity>();
 			_state.SelectedUnits = new List<Entity>();
 
+			_astar.Scan(_astar.graphs);
+
 			var character1 = SpawnUnit(_config.UnitPrefab, "Ariette", new Vector3(0f, 0f, 0f));
 			_state.Entities.Add(character1);
 			var character2 = SpawnUnit(_config.UnitPrefab, "Joe", new Vector3(3f, 2f, 0f));
@@ -27,19 +29,16 @@ namespace GameJam
 			var character3 = SpawnUnit(_config.UnitPrefab, "Jessi", new Vector3(-5f, -2f, 0f));
 			_state.Entities.Add(character3);
 
-			var obstacle1 = SpawnObstacle(_config.ObstaclePrefab, "Obstacle1", new Vector3(9f, 7f, 0f), 2, 2, new Vector3(11f, 7f, 0f));
+			var obstacle1 = SpawnObstacle(_config.ObstaclePrefab, "Obstacle1", new Vector3(-26f, 6f, 0f), 2, 2, new Vector3(-26f, 0f, 0f));
 			_state.Entities.Add(obstacle1);
-			var obstacle2 = SpawnObstacle(_config.ObstaclePrefab, "Obstacle2", new Vector3(5f, -3f, 0f), 1, 2, new Vector3(5f, -1f, 0f));
+			var obstacle2 = SpawnObstacle(_config.ObstaclePrefab, "Obstacle2", new Vector3(-2f, 22f, 0f), 1, 2, new Vector3(2f, 22f, 0f));
 			_state.Entities.Add(obstacle2);
 
 			foreach (var character in _state.Entities)
 			{
 				SelectCharacter(character.Component, false);
 				SetDebugText(character.Component, "");
-
 			}
-
-			_astar.Scan(_astar.graphs);
 
 			_ui.ShowGameplay();
 
@@ -65,6 +64,13 @@ namespace GameJam
 		{
 			base.Tick();
 
+			var moveInput = _controls.Gameplay.Move.ReadValue<Vector2>();
+			if (moveInput.magnitude > 0f)
+			{
+				var cameraMoveSpeed = 10f;
+				_camera.transform.position = Vector3.Lerp(_camera.transform.position, _camera.transform.position + new Vector3(moveInput.x, moveInput.y, 0f), cameraMoveSpeed * Time.deltaTime);
+			}
+
 			foreach (var entity in _state.Units)
 			{
 				SetDebugText(entity.Component, $"{entity.State}");
@@ -74,6 +80,7 @@ namespace GameJam
 					case Entity.States.Idle:
 					{
 						entity.Component.AI.canMove = false;
+						entity.Component.Rigidbody.velocity = Vector3.zero;
 					} break;
 
 					case Entity.States.Moving:
@@ -186,7 +193,7 @@ namespace GameJam
 			_state.IsSelectionInProgress = false;
 
 			var (origin, size) = GetSelectionBox(_state.SelectionStart, _state.SelectionEnd);
-			var hits = Physics2D.BoxCastAll(origin, new Vector2(Mathf.Abs(size.x), Mathf.Abs(size.y)), 0f, Vector2.zero);
+			var hits = Physics2D.BoxCastAll(origin, new Vector2(Mathf.Abs(size.x), Mathf.Abs(size.y)), 0f, Vector2.zero, 0f, _config.SelectionMask);
 			foreach (var hit in hits)
 			{
 				var entityComponent = hit.transform.GetComponentInParent<EntityComponent>();
