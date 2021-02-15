@@ -6,7 +6,7 @@ namespace GameJam
 	public abstract class BaseGameState : IState
 	{
 		protected readonly GameStateMachine _machine;
-		private readonly Game _game;
+		protected readonly Game _game;
 
 		protected GameConfig _config => _game.Config;
 		protected GameUI _ui => _game.UI;

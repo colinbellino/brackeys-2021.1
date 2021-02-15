@@ -16,6 +16,8 @@ namespace GameJam
 
 	public class Entity
 	{
+		public static float MIN_MOVE_DISTANCE = 3f;
+
 		public string Name;
 		public Types Type;
 		public EntityComponent Component;
@@ -23,16 +25,16 @@ namespace GameJam
 		// Units
 		public Vector3 MoveDestination;
 		public Entity ActionTarget;
-		public States State;
+		public UnitStateMachine UnitStateMachine;
 
 		// Obstacles
 		public int RequiredUnits;
 		public float Duration;
 		public float Progress;
 		public Vector3 ObstacleDestination;
+		public ObstacleStateMachine ObstacleStateMachine;
 
 		public enum Types { None, Unit, Obstacle }
-		public enum States { Idle, Moving, Acting, Inactive }
 
 		public override string ToString() => Name;
 	}
