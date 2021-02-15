@@ -11,7 +11,7 @@ namespace GameJam
 	{
 		public GameplayState(GameStateMachine machine, Game game) : base(machine, game) { }
 
-		private const float MIN_MOVE_DISTANCE = 1f;
+		private const float MIN_MOVE_DISTANCE = 1.5f;
 
 		public override async UniTask Enter()
 		{
@@ -36,7 +36,10 @@ namespace GameJam
 			{
 				SelectCharacter(character.Component, false);
 				SetDebugText(character.Component, "");
+
 			}
+
+			_astar.Scan(_astar.graphs);
 
 			_ui.ShowGameplay();
 
@@ -64,23 +67,38 @@ namespace GameJam
 
 			foreach (var entity in _state.Units)
 			{
+				SetDebugText(entity.Component, $"{entity.State}");
+
 				switch (entity.State)
 				{
+					case Entity.States.Idle:
+					{
+						entity.Component.AI.canMove = false;
+					} break;
+
 					case Entity.States.Moving:
 					{
-						MoveTowards(entity, entity.MoveDestination, entity.MoveSpeed * Time.deltaTime);
+						entity.Component.AI.canMove = true;
+						entity.Component.AI.destination = entity.MoveDestination;
 
 						if (Vector3.Distance(entity.Component.RootTransform.position, entity.MoveDestination) < MIN_MOVE_DISTANCE)
 						{
-							entity.State = Entity.States.Acting;
+							if (entity.ActionTarget == null)
+							{
+								entity.State = Entity.States.Idle;
+							}
+							else
+							{
+								entity.State = Entity.States.Acting;
+							}
 						}
 					} break;
 
 					case Entity.States.Acting:
 					{
-						if (entity.ActionTarget != null)
+						if (entity.ActionTarget.State == Entity.States.Inactive)
 						{
-							// Debug.Log(entity.Name + " interacting with " + entity.ActionTarget.Name);
+							entity.State = Entity.States.Idle;
 						}
 					} break;
 				}
@@ -103,12 +121,20 @@ namespace GameJam
 
 					case Entity.States.Moving:
 					{
-						MoveTowards(entity, entity.ObstacleDestination, entity.Progress / entity.Duration);
-						entity.Progress += Time.deltaTime;
-
-						if (entity.Progress > entity.Duration)
+						if (count >= entity.RequiredUnits)
 						{
-							entity.State = Entity.States.Inactive;
+							entity.Progress += Time.deltaTime;
+
+							if (entity.Progress > entity.Duration)
+							{
+								entity.Component.RootTransform.position = entity.ObstacleDestination;
+								_astar.UpdateGraphs(new Bounds(entity.Component.RootTransform.position, new Vector3Int(10, 10, 1)));
+								entity.State = Entity.States.Inactive;
+							}
+						}
+						else
+						{
+							entity.State = Entity.States.Idle;
 						}
 					} break;
 				}
@@ -163,7 +189,7 @@ namespace GameJam
 			var hits = Physics2D.BoxCastAll(origin, new Vector2(Mathf.Abs(size.x), Mathf.Abs(size.y)), 0f, Vector2.zero);
 			foreach (var hit in hits)
 			{
-				var entityComponent = hit.transform.GetComponentInParent<CharacterComponent>();
+				var entityComponent = hit.transform.GetComponentInParent<EntityComponent>();
 				var entity = GetEntity(entityComponent);
 				if (entity?.Type == Entity.Types.Unit)
 				{
@@ -181,9 +207,9 @@ namespace GameJam
 			var mouseWorldPosition = _camera.ScreenToWorldPoint(mousePosition);
 			mouseWorldPosition.z = 0f;
 
-			foreach (var character in _state.SelectedUnits)
+			foreach (var entity in _state.SelectedUnits)
 			{
-				OrderAtPosition(character, mouseWorldPosition);
+				OrderAtPosition(entity, mouseWorldPosition);
 			}
 		}
 
@@ -198,7 +224,7 @@ namespace GameJam
 			var hit = Physics2D.CircleCast(destination, 0.5f, Vector2.zero);
 			if (hit.collider)
 			{
-				var targetComponent = hit.transform.GetComponentInParent<CharacterComponent>();
+				var targetComponent = hit.transform.GetComponentInParent<EntityComponent>();
 				var targetCharacter = GetEntity(targetComponent);
 				if (targetCharacter?.Type == Entity.Types.Obstacle)
 				{
@@ -211,7 +237,7 @@ namespace GameJam
 			}
 		}
 
-		private Entity GetEntity(CharacterComponent component)
+		private Entity GetEntity(EntityComponent component)
 		{
 			return _state.Entities.Find(character => character.Component == component);
 		}
