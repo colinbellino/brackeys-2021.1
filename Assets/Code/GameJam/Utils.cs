@@ -18,14 +18,14 @@ namespace GameJam
 			return manager.Game;
 		}
 
-        public static Entity SpawnUnit(CharacterComponent prefab, string name, Vector3 position)
+        public static Entity SpawnUnit(EntityComponent prefab, string name, Vector3 position)
         {
 	        var component = GameObject.Instantiate(prefab, position, Quaternion.identity);
 	        component.gameObject.name = name;
 	        return new Entity { Name = name, Component = component, Type = Entity.Types.Unit };
         }
 
-        public static Entity SpawnObstacle(CharacterComponent prefab, string name, Vector3 position, int requiredUnits, int duration, Vector3 destination)
+        public static Entity SpawnObstacle(EntityComponent prefab, string name, Vector3 position, int requiredUnits, int duration, Vector3 destination)
         {
 	        var component = GameObject.Instantiate(prefab, position, Quaternion.identity);
 	        component.gameObject.name = name;
@@ -55,26 +55,20 @@ namespace GameJam
 	        return (origin, size);
         }
 
-        public static void SelectCharacter(CharacterComponent character, bool value)
+        public static void SelectCharacter(EntityComponent entity, bool value)
         {
-	        if (character.Selection != null)
+	        if (entity.Selection != null)
 	        {
-		        character.Selection.SetActive(value);
+		        entity.Selection.SetActive(value);
 	        }
         }
 
-        public static void SetDebugText(CharacterComponent characterComponent, string value)
+        public static void SetDebugText(EntityComponent entityComponent, string value)
         {
-	        if (characterComponent.DebugText != null)
+	        if (entityComponent.DebugText != null)
 	        {
-		        characterComponent.DebugText.text = value;
+		        entityComponent.DebugText.text = value;
 	        }
-        }
-
-        public static void MoveTowards(Entity entity, Vector3 destination, float step)
-        {
-	        var motion = (destination - entity.Component.RootTransform.position).normalized;
-	        entity.Component.CharacterController.Move(motion * step);
         }
 	}
 }

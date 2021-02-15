@@ -11,8 +11,8 @@ TagManager:
   - 
   - Water
   - UI
-  - Ground
-  - AttachedToCamera
+  - Blocking
+  - 
   - 
   - 
   - 
@@ -40,6 +40,9 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Entities
+    uniqueID: 1463812865
     locked: 0
   - name: SFX
     uniqueID: 995917501

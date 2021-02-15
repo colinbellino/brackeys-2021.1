@@ -16,6 +16,8 @@ namespace GameJam
 
 			Time.timeScale = 1f;
 
+			await UniTask.NextFrame();
+
 			_machine.Fire(GameStateMachine.Triggers.Done);
 		}
 	}
