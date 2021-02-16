@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Stateless;
 using UnityEngine;
 
 namespace GameJam
@@ -22,9 +21,9 @@ namespace GameJam
         {
 	        var component = GameObject.Instantiate(prefab, position, Quaternion.identity);
 	        component.gameObject.name = name;
-	        var entity = new Entity { Name = name, Component = component, Type = Entity.Types.Unit };
-	        entity.UnitStateMachine = new UnitStateMachine(false, game, entity);
-	        entity.UnitStateMachine.Start();
+	        var entity = new Unit { Name = name, Component = component };
+	        entity.StateMachine = new UnitStateMachine(false, game, entity);
+	        entity.StateMachine.Start();
 	        return entity;
         }
 
@@ -32,9 +31,9 @@ namespace GameJam
         {
 	        var component = GameObject.Instantiate(prefab, position, Quaternion.identity);
 	        component.gameObject.name = name;
-	        var entity = new Entity { Name = name, Component = component, Type = Entity.Types.Obstacle, RequiredUnits = requiredUnits, Duration = duration, ObstacleDestination = destination};
-	        entity.ObstacleStateMachine = new ObstacleStateMachine(false, game, entity);
-	        entity.ObstacleStateMachine.Start();
+	        var entity = new Obstacle { Name = name, Component = component, RequiredUnits = requiredUnits, Duration = duration, PushDestination = destination};
+	        entity.StateMachine = new ObstacleStateMachine(false, game, entity);
+	        entity.StateMachine.Start();
 	        return entity;
         }
 
@@ -77,31 +76,23 @@ namespace GameJam
 	        }
         }
 
-        public static void OrderToMove(Entity entity, Vector3 destination, List<Entity> entities)
+        public static void OrderToMove(Unit entity, Vector3 destination, List<Entity> entities)
         {
-	        if (Vector3.Distance(entity.Component.RootTransform.position, destination) > Entity.MIN_MOVE_DISTANCE)
-	        {
-		        entity.MoveDestination = destination;
-	        }
-
-	        var hit = Physics2D.CircleCast(destination, 0.5f, Vector2.zero);
+			var hit = Physics2D.CircleCast(destination, 0.5f, Vector2.zero);
 	        if (hit.collider)
 	        {
 		        var targetComponent = hit.transform.GetComponentInParent<EntityComponent>();
-		        var targetCharacter = entities.Find(entity => entity.Component == targetComponent);
-		        if (targetCharacter?.Type == Entity.Types.Obstacle)
+		        var targetEntity = entities.Find(entity => entity.Component == targetComponent);
+		        if (targetEntity is Obstacle obstacle)
 		        {
-			        entity.ActionTarget = targetCharacter;
+			        entity.ActionTarget = obstacle;
 		        }
 	        }
-	        else
-	        {
-		        entity.ActionTarget = null;
-	        }
 
-	        if (entity.UnitStateMachine.CanFire(UnitStateMachine.Triggers.StartMoving))
+	        if (Vector3.Distance(entity.Component.RootTransform.position, destination) > Entity.MIN_MOVE_DISTANCE)
 	        {
-		        entity.UnitStateMachine.Fire(UnitStateMachine.Triggers.StartMoving);
+		        entity.MoveDestination = destination;
+		        entity.StateMachine.Fire(UnitStateMachine.Triggers.StartMoving);
 	        }
         }
 

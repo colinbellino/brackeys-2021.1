@@ -7,35 +7,32 @@ namespace GameJam
 {
 	public class ObstacleStateMachine
 	{
-		public enum States { Idle, Moving }
-		public enum Triggers { StartMoving, Done }
+		public enum States { Idle, Moving, Inactive }
+		public enum Triggers { StartMoving, StopMoving, Done }
 
 		private readonly Dictionary<States, IState> _states;
 		private readonly StateMachine<States, Triggers> _machine;
 		private IState _currentState;
 		private readonly bool _debug;
 
-		public ObstacleStateMachine(bool debug, Game game, Entity entity)
+		public ObstacleStateMachine(bool debug, Game game, Obstacle entity)
 		{
 			_debug = debug;
 			_states = new Dictionary<States, IState>
 			{
 				{ States.Idle, new IdleState(this, game, entity) },
 				{ States.Moving, new MovingState(this, game, entity) },
+				{ States.Inactive, new InactiveState(this, game, entity) },
 			};
 
 			_machine = new StateMachine<States, Triggers>(States.Idle);
 			_machine.OnTransitioned(OnTransitioned);
 
 			_machine.Configure(States.Idle)
-				.Permit(Triggers.StartMoving, States.Moving)
-				.Permit(Triggers.StartPushing, States.Pushing);
+				.Permit(Triggers.StartMoving, States.Moving);
 			_machine.Configure(States.Moving)
-				.Permit(Triggers.StartPushing, States.Pushing)
-				.Permit(Triggers.Done, States.Idle);
-			_machine.Configure(States.Pushing)
-				.Permit(Triggers.StartMoving, States.Moving)
-				.Permit(Triggers.Done, States.Idle);
+				.Permit(Triggers.StopMoving, States.Idle)
+				.Permit(Triggers.Done, States.Inactive);
 
 			_currentState = _states[_machine.State];
 		}
@@ -76,13 +73,13 @@ namespace GameJam
 		{
 			protected readonly ObstacleStateMachine _machine;
 			protected readonly Game _game;
-			protected readonly Entity _entity;
+			protected readonly Obstacle _actor;
 
-			protected BaseObstacleState(ObstacleStateMachine machine, Game game, Entity entity)
+			protected BaseObstacleState(ObstacleStateMachine machine, Game game, Obstacle actor)
 			{
 				_machine = machine;
 				_game = game;
-				_entity = entity;
+				_actor = actor;
 			}
 
 			public virtual UniTask Enter() { return default; }
@@ -91,73 +88,54 @@ namespace GameJam
 
 			public virtual void Tick()
 			{
-				Utils.SetDebugText(_entity.Component, $"{GetType().Name}");
-			}
-		}
-
-		private class BootstrapEntity : BaseObstacleState
-		{
-			public BootstrapEntity(ObstacleStateMachine machine, Game game, Entity entity) : base(machine, game, entity) { }
-
-			public override async UniTask Enter()
-			{
-				await base.Enter();
-
-				_machine.Fire(Triggers.Done);
+				Utils.SetDebugText(_actor.Component, $"{GetType().Name}");
 			}
 		}
 
 		private class IdleState : BaseObstacleState
 		{
-			public IdleState(ObstacleStateMachine machine, Game game, Entity entity) : base(machine, game, entity) { }
+			public IdleState(ObstacleStateMachine machine, Game game, Obstacle actor) : base(machine, game, actor) { }
 
 			public override void Tick()
 			{
 				base.Tick();
 
-				_entity.Component.AI.canMove = false;
-				_entity.Component.Rigidbody.velocity = Vector3.zero;
+				if (_actor.PushedBy.Count >= _actor.RequiredUnits)
+				{
+					_machine.Fire(Triggers.StartMoving);
+				}
 			}
 		}
 
 		private class MovingState : BaseObstacleState
 		{
-			public MovingState(ObstacleStateMachine machine, Game game, Entity entity) : base(machine, game, entity) { }
+			public MovingState(ObstacleStateMachine machine, Game game, Obstacle actor) : base(machine, game, actor) { }
 
 			public override void Tick()
 			{
 				base.Tick();
 
-				_entity.Component.AI.canMove = true;
-				_entity.Component.AI.destination = _entity.MoveDestination;
-
-				if (Vector3.Distance(_entity.Component.RootTransform.position, _entity.MoveDestination) < Entity.MIN_MOVE_DISTANCE)
+				if (_actor.PushedBy.Count >= _actor.RequiredUnits)
 				{
-					if (_entity.ActionTarget == null)
+					_actor.Progress += Time.deltaTime;
+
+					if (_actor.Progress > _actor.Duration)
 					{
+						_actor.Component.RootTransform.position = _actor.PushDestination;
+						_game.Astar.UpdateGraphs(new Bounds(_actor.Component.RootTransform.position, new Vector3Int(10, 10, 1)));
 						_machine.Fire(Triggers.Done);
 					}
-					else
-					{
-						_machine.Fire(Triggers.StartPushing);
-					}
+				}
+				else
+				{
+					_machine.Fire(Triggers.StopMoving);
 				}
 			}
 		}
 
-		private class PushingState : BaseObstacleState
+		private class InactiveState : BaseObstacleState
 		{
-			public PushingState(ObstacleStateMachine machine, Game game, Entity entity) : base(machine, game, entity) { }
-
-			public override void Tick()
-			{
-				base.Tick();
-
-				if (_entity.ActionTarget?.Progress >= _entity.ActionTarget?.Duration)
-				{
-					_machine.Fire(Triggers.Done);
-				}
-			}
+			public InactiveState(ObstacleStateMachine machine, Game game, Obstacle actor) : base(machine, game, actor) { }
 		}
 	}
 }

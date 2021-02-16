@@ -7,9 +7,9 @@ namespace GameJam
 	public class GameState
 	{
 		public List<Entity> Entities;
-		public IEnumerable<Entity> Units => Entities.Where(entity => entity.Type == Entity.Types.Unit);
-		public IEnumerable<Entity> Obstacles => Entities.Where(entity => entity.Type == Entity.Types.Obstacle);
-		public List<Entity> SelectedUnits;
+		public IEnumerable<Unit> Units => Entities.Where(entity => entity is Unit).Cast<Unit>();
+		public IEnumerable<Obstacle> Obstacles => Entities.Where(entity => entity is Obstacle).Cast<Obstacle>();
+		public List<Unit> SelectedUnits;
 
 		public Vector3 SelectionStart;
 		public Vector3 SelectionEnd;

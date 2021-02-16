@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -16,7 +15,7 @@ namespace GameJam
 			await base.Enter();
 
 			_state.Entities = new List<Entity>();
-			_state.SelectedUnits = new List<Entity>();
+			_state.SelectedUnits = new List<Unit>();
 
 			_astar.Scan(_astar.graphs);
 
@@ -69,45 +68,14 @@ namespace GameJam
 				_camera.transform.position = Vector3.Lerp(_camera.transform.position, _camera.transform.position + new Vector3(moveInput.x, moveInput.y, 0f), cameraMoveSpeed * Time.deltaTime);
 			}
 
-			foreach (var entity in _state.Entities)
+			foreach (var entity in _state.Units)
 			{
-				entity.UnitStateMachine?.Tick();
+				entity.StateMachine?.Tick();
 			}
 
 			foreach (var entity in _state.Obstacles)
 			{
-				// var count = _state.Entities.Count(c => c.ActionTarget == entity && c.State == Entity.States.Acting);
-				// SetDebugText(entity.Component, $"{entity.State}\n{count}/{entity.RequiredUnits}");
-				//
-				// switch (entity.State)
-				// {
-				// 	case Entity.States.Idle:
-				// 	{
-				// 		if (count >= entity.RequiredUnits)
-				// 		{
-				// 			entity.State = Entity.States.Moving;
-				// 		}
-				// 	} break;
-				//
-				// 	case Entity.States.Moving:
-				// 	{
-				// 		if (count >= entity.RequiredUnits)
-				// 		{
-				// 			entity.Progress += Time.deltaTime;
-				//
-				// 			if (entity.Progress > entity.Duration)
-				// 			{
-				// 				entity.Component.RootTransform.position = entity.ObstacleDestination;
-				// 				_astar.UpdateGraphs(new Bounds(entity.Component.RootTransform.position, new Vector3Int(10, 10, 1)));
-				// 				entity.State = Entity.States.Inactive;
-				// 			}
-				// 		}
-				// 		else
-				// 		{
-				// 			entity.State = Entity.States.Idle;
-				// 		}
-				// 	} break;
-				// }
+				entity.StateMachine?.Tick();
 			}
 
 			if (_state.IsSelectionInProgress)
@@ -152,7 +120,7 @@ namespace GameJam
 				SelectCharacter(character.Component, false);
 			}
 
-			_state.SelectedUnits = new List<Entity>();
+			_state.SelectedUnits.Clear();
 			_state.IsSelectionInProgress = false;
 
 			var (origin, size) = GetSelectionBox(_state.SelectionStart, _state.SelectionEnd);
@@ -161,14 +129,14 @@ namespace GameJam
 			{
 				var entityComponent = hit.transform.GetComponentInParent<EntityComponent>();
 				var entity = GetEntity(_state.Entities, entityComponent);
-				if (entity?.Type == Entity.Types.Unit)
+				if (entity is Unit unit)
 				{
-					_state.SelectedUnits.Add(entity);
+					_state.SelectedUnits.Add(unit);
 					SelectCharacter(entityComponent, true);
 				}
 			}
 
-			_ui.SelectSelectedCharacters(_state.SelectedUnits);
+			_ui.SetSelectedUnits(_state.SelectedUnits);
 		}
 
 		private void OnCancelReleased(InputAction.CallbackContext obj)

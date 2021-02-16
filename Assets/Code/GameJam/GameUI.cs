@@ -45,12 +45,12 @@ namespace GameJam
 		public void ShowDefeat() { _defeatRoot.SetActive(true); }
 		public void HideDefeat() { _defeatRoot.SetActive(false); }
 
-		public void SelectSelectedCharacters(List<Entity> characters)
+		public void SetSelectedUnits(List<Unit> units)
 		{
 			_debugText.text = "Selected characters:\n";
-			foreach (var character in characters)
+			foreach (var unit in units)
 			{
-				_debugText.text += $"- {character.Name}\n";
+				_debugText.text += $"- {unit.Name}\n";
 			}
 		}
 
