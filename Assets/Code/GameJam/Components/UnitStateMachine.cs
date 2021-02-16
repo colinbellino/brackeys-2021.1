@@ -15,7 +15,7 @@ namespace GameJam
 		private IState _currentState;
 		private readonly bool _debug;
 
-		public UnitStateMachine(bool debug, Game game, Entity entity)
+		public UnitStateMachine(bool debug, Game game, Unit entity)
 		{
 			_debug = debug;
 			_states = new Dictionary<States, IState>
@@ -30,6 +30,7 @@ namespace GameJam
 				.Permit(Triggers.StartMoving, States.Moving)
 				.Permit(Triggers.StartPushing, States.Pushing);
 			_machine.Configure(States.Moving)
+				.PermitReentry(Triggers.StartMoving)
 				.Permit(Triggers.StartPushing, States.Pushing)
 				.Permit(Triggers.Done, States.Idle);
 			_machine.Configure(States.Pushing)
@@ -77,13 +78,13 @@ namespace GameJam
 		{
 			protected readonly UnitStateMachine _machine;
 			protected readonly Game _game;
-			protected readonly Entity _entity;
+			protected readonly Unit _actor;
 
-			protected BaseEntityState(UnitStateMachine machine, Game game, Entity entity)
+			protected BaseEntityState(UnitStateMachine machine, Game game, Unit actor)
 			{
 				_machine = machine;
 				_game = game;
-				_entity = entity;
+				_actor = actor;
 			}
 
 			public virtual UniTask Enter() { return default; }
@@ -92,49 +93,37 @@ namespace GameJam
 
 			public virtual void Tick()
 			{
-				Utils.SetDebugText(_entity.Component, $"{GetType().Name}");
-			}
-		}
-
-		private class BootstrapEntity : BaseEntityState
-		{
-			public BootstrapEntity(UnitStateMachine machine, Game game, Entity entity) : base(machine, game, entity) { }
-
-			public override async UniTask Enter()
-			{
-				await base.Enter();
-
-				_machine.Fire(Triggers.Done);
+				Utils.SetDebugText(_actor.Component, $"{GetType().Name}");
 			}
 		}
 
 		private class IdleState : BaseEntityState
 		{
-			public IdleState(UnitStateMachine machine, Game game, Entity entity) : base(machine, game, entity) { }
+			public IdleState(UnitStateMachine machine, Game game, Unit actor) : base(machine, game, actor) { }
 
 			public override void Tick()
 			{
 				base.Tick();
 
-				_entity.Component.AI.canMove = false;
-				_entity.Component.Rigidbody.velocity = Vector3.zero;
+				_actor.Component.AI.canMove = false;
+				_actor.Component.Rigidbody.velocity = Vector3.zero;
 			}
 		}
 
 		private class MovingState : BaseEntityState
 		{
-			public MovingState(UnitStateMachine machine, Game game, Entity entity) : base(machine, game, entity) { }
+			public MovingState(UnitStateMachine machine, Game game, Unit actor) : base(machine, game, actor) { }
 
 			public override void Tick()
 			{
 				base.Tick();
 
-				_entity.Component.AI.canMove = true;
-				_entity.Component.AI.destination = _entity.MoveDestination;
+				_actor.Component.AI.canMove = true;
+				_actor.Component.AI.destination = _actor.MoveDestination;
 
-				if (Vector3.Distance(_entity.Component.RootTransform.position, _entity.MoveDestination) < Entity.MIN_MOVE_DISTANCE)
+				if (Vector3.Distance(_actor.Component.RootTransform.position, _actor.MoveDestination) < Entity.MIN_MOVE_DISTANCE)
 				{
-					if (_entity.ActionTarget == null)
+					if (_actor.ActionTarget == null)
 					{
 						_machine.Fire(Triggers.Done);
 					}
@@ -148,13 +137,28 @@ namespace GameJam
 
 		private class PushingState : BaseEntityState
 		{
-			public PushingState(UnitStateMachine machine, Game game, Entity entity) : base(machine, game, entity) { }
+			public PushingState(UnitStateMachine machine, Game game, Unit actor) : base(machine, game, actor) { }
+
+			public override async UniTask Enter()
+			{
+				await base.Enter();
+
+				_actor.ActionTarget.PushedBy.Add(_actor);
+			}
+
+			public override async UniTask Exit()
+			{
+				await base.Exit();
+
+				_actor.ActionTarget.PushedBy.Remove(_actor);
+				_actor.ActionTarget = null;
+			}
 
 			public override void Tick()
 			{
 				base.Tick();
 
-				if (_entity.ActionTarget?.Progress >= _entity.ActionTarget?.Duration)
+				if (_actor.ActionTarget?.Progress >= _actor.ActionTarget?.Duration)
 				{
 					_machine.Fire(Triggers.Done);
 				}

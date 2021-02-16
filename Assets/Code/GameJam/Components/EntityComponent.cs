@@ -1,4 +1,5 @@
-﻿using Pathfinding;
+﻿using System.Collections.Generic;
+using Pathfinding;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -19,23 +20,25 @@ namespace GameJam
 		public static float MIN_MOVE_DISTANCE = 3f;
 
 		public string Name;
-		public Types Type;
 		public EntityComponent Component;
 
-		// Units
-		public Vector3 MoveDestination;
-		public Entity ActionTarget;
-		public UnitStateMachine UnitStateMachine;
+		public override string ToString() => Name;
+	}
 
-		// Obstacles
+	public class Obstacle : Entity
+	{
 		public int RequiredUnits;
 		public float Duration;
 		public float Progress;
-		public Vector3 ObstacleDestination;
-		public ObstacleStateMachine ObstacleStateMachine;
+		public Vector3 PushDestination;
+		public ObstacleStateMachine StateMachine;
+		public List<Entity> PushedBy = new List<Entity>();
+	}
 
-		public enum Types { None, Unit, Obstacle }
-
-		public override string ToString() => Name;
+	public class Unit : Entity
+	{
+		public Vector3 MoveDestination;
+		public Obstacle ActionTarget;
+		public UnitStateMachine StateMachine;
 	}
 }
