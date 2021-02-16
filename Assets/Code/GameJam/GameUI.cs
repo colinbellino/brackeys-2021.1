@@ -14,6 +14,7 @@ namespace GameJam
 		[SerializeField] private GameObject _gameplayRoot;
 		[SerializeField] private Text _debugText;
 		[SerializeField] private SpriteRenderer _selectionRectangle;
+		[SerializeField] private Transform _cursor;
 		[Header("Victory")]
 		[SerializeField] private GameObject _victoryRoot;
 		[SerializeField] private Button _victoryRetryButton;
@@ -64,6 +65,11 @@ namespace GameJam
 		public void ClearSelectionRectangle()
 		{
 			_selectionRectangle.size = Vector2.zero;
+		}
+
+		public void MoveCursor(Vector3 position)
+		{
+			_cursor.position = position;
 		}
 	}
 }

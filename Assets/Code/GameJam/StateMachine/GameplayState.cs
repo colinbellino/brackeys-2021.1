@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -14,27 +15,23 @@ namespace GameJam
 		{
 			await base.Enter();
 
-			_state.Entities = new List<Entity>();
-			_state.SelectedUnits = new List<Unit>();
+			_state.Units = new List<Unit>();
+			_state.Obstacles = new List<Obstacle>();
+			_state.SelectedUnits = new Queue<Unit>();
 
-			_astar.Scan(_astar.graphs);
-
-			var character1 = SpawnUnit(_config.UnitPrefab, _game, "Ariette", new Vector3(0f, 0f, 0f));
-			_state.Entities.Add(character1);
-			var character2 = SpawnUnit(_config.UnitPrefab, _game, "Joe", new Vector3(3f, 2f, 0f));
-			_state.Entities.Add(character2);
-			var character3 = SpawnUnit(_config.UnitPrefab, _game, "Jessi", new Vector3(-5f, -2f, 0f));
-			_state.Entities.Add(character3);
-
-			var obstacle1 = SpawnObstacle(_config.ObstaclePrefab, _game, "Obstacle1", new Vector3(-26f, 6f, 0f), 2, 2, new Vector3(-26f, 0f, 0f));
-			_state.Entities.Add(obstacle1);
-			var obstacle2 = SpawnObstacle(_config.ObstaclePrefab, _game, "Obstacle2", new Vector3(-2f, 22f, 0f), 1, 2, new Vector3(2f, 22f, 0f));
-			_state.Entities.Add(obstacle2);
-
-			foreach (var character in _state.Entities)
 			{
-				SelectCharacter(character.Component, false);
-				SetDebugText(character.Component, "");
+				var spawner = GameObject.FindObjectOfType<LeaderSpawner>();
+				_state.Leader = SpawnLeader(_config.LeaderPrefab, _game, spawner);
+			}
+
+			foreach (var spawner in GameObject.FindObjectsOfType<UnitSpawner>())
+			{
+				_state.Units.Add(SpawnUnit(_config.UnitPrefab, _game, spawner));
+			}
+
+			foreach (var spawner in GameObject.FindObjectsOfType<ObstacleSpawner>())
+			{
+				_state.Obstacles.Add(SpawnObstacle(_config.ObstaclePrefab, _game, spawner));
 			}
 
 			_ui.ShowGameplay();
@@ -61,11 +58,24 @@ namespace GameJam
 		{
 			base.Tick();
 
+			var mouseWorldPosition = GetMouseWorldPosition(_controls, _camera);
+			_ui.MoveCursor(mouseWorldPosition);
+
+			_camera.transform.position = new Vector3(
+				_state.Leader.Component.RootTransform.position.x,
+				_state.Leader.Component.RootTransform.position.y,
+				_camera.transform.position.z
+			);
+
 			var moveInput = _controls.Gameplay.Move.ReadValue<Vector2>();
 			if (moveInput.magnitude > 0f)
 			{
-				var cameraMoveSpeed = 10f;
-				_camera.transform.position = Vector3.Lerp(_camera.transform.position, _camera.transform.position + new Vector3(moveInput.x, moveInput.y, 0f), cameraMoveSpeed * Time.deltaTime);
+				_state.Leader.Component.Rigidbody.velocity = Vector3.zero;
+				_state.Leader.Component.RootTransform.position = Vector3.Lerp(
+					_state.Leader.Component.RootTransform.position,
+					_state.Leader.Component.RootTransform.position + new Vector3(moveInput.x, moveInput.y, 0f),
+					_state.Leader.MoveSpeed * Time.deltaTime
+				);
 			}
 
 			foreach (var entity in _state.Units)
@@ -78,18 +88,7 @@ namespace GameJam
 				entity.StateMachine?.Tick();
 			}
 
-			if (_state.IsSelectionInProgress)
-			{
-				var mousePosition = _controls.Gameplay.MousePosition.ReadValue<Vector2>();
-				var mouseWorldPosition = _camera.ScreenToWorldPoint(mousePosition);
-				_state.SelectionEnd = mouseWorldPosition;
-
-				_ui.SetSelectionRectangle(_state.SelectionStart, _state.SelectionEnd);
-			}
-			else
-			{
-				_ui.ClearSelectionRectangle();
-			}
+			_ui.SetSelectedUnits(_state.SelectedUnits.ToList());
 
 			if (IsDevBuild())
 			{
@@ -106,49 +105,26 @@ namespace GameJam
 
 		private void OnConfirmPressed(InputAction.CallbackContext obj)
 		{
-			var mousePosition = _controls.Gameplay.MousePosition.ReadValue<Vector2>();
-			var mouseWorldPosition = _camera.ScreenToWorldPoint(mousePosition);
 
-			_state.IsSelectionInProgress = true;
-			_state.SelectionStart = mouseWorldPosition;
 		}
 
 		private void OnConfirmReleased(InputAction.CallbackContext obj)
 		{
-			foreach (var character in _state.SelectedUnits)
+			if (_state.SelectedUnits.Count == 0)
 			{
-				SelectCharacter(character.Component, false);
+				return;
 			}
 
-			_state.SelectedUnits.Clear();
-			_state.IsSelectionInProgress = false;
+			var mouseWorldPosition = GetMouseWorldPosition(_controls, _camera);
+			var unit = _state.SelectedUnits.Dequeue();
 
-			var (origin, size) = GetSelectionBox(_state.SelectionStart, _state.SelectionEnd);
-			var hits = Physics2D.BoxCastAll(origin, new Vector2(Mathf.Abs(size.x), Mathf.Abs(size.y)), 0f, Vector2.zero, 0f, _config.SelectionMask);
-			foreach (var hit in hits)
-			{
-				var entityComponent = hit.transform.GetComponentInParent<EntityComponent>();
-				var entity = GetEntity(_state.Entities, entityComponent);
-				if (entity is Unit unit)
-				{
-					_state.SelectedUnits.Add(unit);
-					SelectCharacter(entityComponent, true);
-				}
-			}
-
-			_ui.SetSelectedUnits(_state.SelectedUnits);
+			unit.MoveDestination = mouseWorldPosition;
+			unit.StateMachine.Fire(UnitStateMachine.Triggers.Thrown);
 		}
 
 		private void OnCancelReleased(InputAction.CallbackContext obj)
 		{
-			var mousePosition = _controls.Gameplay.MousePosition.ReadValue<Vector2>();
-			var mouseWorldPosition = _camera.ScreenToWorldPoint(mousePosition);
-			mouseWorldPosition.z = 0f;
 
-			foreach (var entity in _state.SelectedUnits)
-			{
-				OrderToMove(entity, mouseWorldPosition, _state.Entities);
-			}
 		}
 	}
 }

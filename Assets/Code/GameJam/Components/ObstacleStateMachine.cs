@@ -14,10 +14,12 @@ namespace GameJam
 		private readonly StateMachine<States, Triggers> _machine;
 		private IState _currentState;
 		private readonly bool _debug;
+		private Obstacle _entity;
 
 		public ObstacleStateMachine(bool debug, Game game, Obstacle entity)
 		{
 			_debug = debug;
+			_entity = entity;
 			_states = new Dictionary<States, IState>
 			{
 				{ States.Idle, new IdleState(this, game, entity) },
@@ -30,6 +32,7 @@ namespace GameJam
 
 			_machine.Configure(States.Idle)
 				.Permit(Triggers.StartMoving, States.Moving);
+
 			_machine.Configure(States.Moving)
 				.Permit(Triggers.StopMoving, States.Idle)
 				.Permit(Triggers.Done, States.Inactive);
@@ -63,7 +66,7 @@ namespace GameJam
 			_currentState = _states[transition.Destination];
 			if (_debug)
 			{
-				UnityEngine.Debug.Log($"{transition.Source} -> {transition.Destination}");
+				UnityEngine.Debug.Log($"{_entity}: {transition.Source} -> {transition.Destination}");
 			}
 
 			await _currentState.Enter();
@@ -121,8 +124,7 @@ namespace GameJam
 
 					if (_actor.Progress > _actor.Duration)
 					{
-						_actor.Component.RootTransform.position = _actor.PushDestination;
-						_game.Astar.UpdateGraphs(new Bounds(_actor.Component.RootTransform.position, new Vector3Int(10, 10, 1)));
+						_actor.Component.RootTransform.position += _actor.PushDestination;
 						_machine.Fire(Triggers.Done);
 					}
 				}

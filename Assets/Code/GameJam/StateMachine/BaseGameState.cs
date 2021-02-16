@@ -13,7 +13,6 @@ namespace GameJam
 		protected Camera _camera => _game.Camera;
 		protected GameControls _controls => _game.Controls;
 		protected GameState _state => _game.State;
-		protected AstarPath _astar => _game.Astar;
 
 		protected BaseGameState(GameStateMachine machine, Game game)
 		{
