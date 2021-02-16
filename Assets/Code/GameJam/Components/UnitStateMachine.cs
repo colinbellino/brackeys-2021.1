@@ -2,39 +2,51 @@
 using Cysharp.Threading.Tasks;
 using Stateless;
 using UnityEngine;
+using static GameJam.Utils;
 
 namespace GameJam
 {
 	public class UnitStateMachine
 	{
-		public enum States { Idle, Moving, Pushing }
-		public enum Triggers { StartMoving, StartPushing, Done }
+		public enum States { Inactive, Idle, Following, Moving, Pushing }
+		public enum Triggers { Thrown, StartFollowing, StartPushing, Done }
 
 		private readonly Dictionary<States, IState> _states;
 		private readonly StateMachine<States, Triggers> _machine;
 		private IState _currentState;
 		private readonly bool _debug;
+		private Unit _entity;
 
 		public UnitStateMachine(bool debug, Game game, Unit entity)
 		{
 			_debug = debug;
+			_entity = entity;
 			_states = new Dictionary<States, IState>
 			{
+				{ States.Inactive, new InactiveState(this, game, entity) },
 				{ States.Idle, new IdleState(this, game, entity) },
-				{ States.Moving, new MovingState(this, game, entity) },
+				{ States.Following, new FollowingState(this, game, entity) },
+				{ States.Moving, new ThrownState(this, game, entity) },
 				{ States.Pushing, new PushingState(this, game, entity) },
 			};
 
-			_machine = new StateMachine<States, Triggers>(States.Idle);
+			_machine = new StateMachine<States, Triggers>(States.Inactive);
+
+			_machine.Configure(States.Inactive)
+				.Permit(Triggers.StartFollowing, States.Following);
+
 			_machine.Configure(States.Idle)
-				.Permit(Triggers.StartMoving, States.Moving)
+				.Permit(Triggers.StartFollowing, States.Following)
 				.Permit(Triggers.StartPushing, States.Pushing);
+
+			_machine.Configure(States.Following)
+				.Permit(Triggers.Thrown, States.Moving);
+
 			_machine.Configure(States.Moving)
-				.PermitReentry(Triggers.StartMoving)
-				.Permit(Triggers.StartPushing, States.Pushing)
 				.Permit(Triggers.Done, States.Idle);
+
 			_machine.Configure(States.Pushing)
-				.Permit(Triggers.StartMoving, States.Moving)
+				.Permit(Triggers.StartFollowing, States.Following)
 				.Permit(Triggers.Done, States.Idle);
 
 			_machine.OnTransitioned(OnTransitioned);
@@ -68,7 +80,7 @@ namespace GameJam
 			_currentState = _states[transition.Destination];
 			if (_debug)
 			{
-				UnityEngine.Debug.Log($"{transition.Source} -> {transition.Destination}");
+				UnityEngine.Debug.Log($"{_entity}: {transition.Source} -> {transition.Destination}");
 			}
 
 			await _currentState.Enter();
@@ -93,7 +105,19 @@ namespace GameJam
 
 			public virtual void Tick()
 			{
-				Utils.SetDebugText(_actor.Component, $"{GetType().Name}");
+				SetDebugText(_actor.Component, $"{GetType().Name}");
+			}
+		}
+
+		private class InactiveState : BaseEntityState
+		{
+			public InactiveState(UnitStateMachine machine, Game game, Unit actor) : base(machine, game, actor) { }
+
+			public override void Tick()
+			{
+				base.Tick();
+
+				TryFollowLeader(_actor, _game);
 			}
 		}
 
@@ -105,32 +129,49 @@ namespace GameJam
 			{
 				base.Tick();
 
-				_actor.Component.AI.canMove = false;
 				_actor.Component.Rigidbody.velocity = Vector3.zero;
+
+				TryPushObstacles(_actor, _game);
+				TryFollowLeader(_actor, _game);
 			}
 		}
 
-		private class MovingState : BaseEntityState
+		private class FollowingState : BaseEntityState
 		{
-			public MovingState(UnitStateMachine machine, Game game, Unit actor) : base(machine, game, actor) { }
+			public FollowingState(UnitStateMachine machine, Game game, Unit actor) : base(machine, game, actor) { }
 
 			public override void Tick()
 			{
 				base.Tick();
 
-				_actor.Component.AI.canMove = true;
-				_actor.Component.AI.destination = _actor.MoveDestination;
-
-				if (Vector3.Distance(_actor.Component.RootTransform.position, _actor.MoveDestination) < Entity.MIN_MOVE_DISTANCE)
+				var difference = _actor.FollowTarget.Component.RootTransform.position - _actor.Component.RootTransform.transform.position;
+				if (difference.magnitude > Entity.MIN_FOLLOW_DISTANCE)
 				{
-					if (_actor.ActionTarget == null)
-					{
-						_machine.Fire(Triggers.Done);
-					}
-					else
-					{
-						_machine.Fire(Triggers.StartPushing);
-					}
+					_actor.Component.RootTransform.transform.position = Vector3.Lerp(
+						_actor.Component.RootTransform.transform.position,
+						_actor.Component.RootTransform.transform.position + difference.normalized,
+						Time.deltaTime * _actor.MoveSpeed
+					);
+				}
+			}
+		}
+
+		private class ThrownState : BaseEntityState
+		{
+			public ThrownState(UnitStateMachine machine, Game game, Unit actor) : base(machine, game, actor) { }
+
+			public override void Tick()
+			{
+				base.Tick();
+
+				var difference = _actor.MoveDestination - _actor.Component.RootTransform.transform.position;
+				_actor.Component.Rigidbody.MovePosition(_actor.Component.RootTransform.transform.position + difference.normalized * (Time.fixedDeltaTime * _actor.ThrowSpeed));
+
+				// TODO: stop if we hit a wall
+
+				if (Vector3.Distance(_actor.Component.RootTransform.position, _actor.MoveDestination) <= 0.1f)
+				{
+					_machine.Fire(Triggers.Done);
 				}
 			}
 		}
@@ -157,6 +198,8 @@ namespace GameJam
 			public override void Tick()
 			{
 				base.Tick();
+
+				TryFollowLeader(_actor, _game);
 
 				if (_actor.ActionTarget?.Progress >= _actor.ActionTarget?.Duration)
 				{

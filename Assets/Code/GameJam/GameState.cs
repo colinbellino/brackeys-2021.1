@@ -6,10 +6,10 @@ namespace GameJam
 {
 	public class GameState
 	{
-		public List<Entity> Entities;
-		public IEnumerable<Unit> Units => Entities.Where(entity => entity is Unit).Cast<Unit>();
-		public IEnumerable<Obstacle> Obstacles => Entities.Where(entity => entity is Obstacle).Cast<Obstacle>();
-		public List<Unit> SelectedUnits;
+		public List<Unit> Units = new List<Unit>();
+		public Unit Leader;
+		public Queue<Unit> SelectedUnits;
+		public List<Obstacle> Obstacles = new List<Obstacle>();
 
 		public Vector3 SelectionStart;
 		public Vector3 SelectionEnd;

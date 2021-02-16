@@ -7,6 +7,7 @@ namespace GameJam
 	{
 		public EntityComponent UnitPrefab;
 		public EntityComponent ObstaclePrefab;
+		public EntityComponent LeaderPrefab;
 		public LayerMask SelectionMask;
 	}
 }

@@ -18,11 +18,17 @@ namespace GameJam
 	public class Entity
 	{
 		public static float MIN_MOVE_DISTANCE = 3f;
+		public static float MIN_FOLLOW_DISTANCE = 1f;
 
 		public string Name;
 		public EntityComponent Component;
 
 		public override string ToString() => Name;
+	}
+
+	public class Leader : Entity
+	{
+
 	}
 
 	public class Obstacle : Entity
@@ -40,5 +46,8 @@ namespace GameJam
 		public Vector3 MoveDestination;
 		public Obstacle ActionTarget;
 		public UnitStateMachine StateMachine;
+		public float MoveSpeed = 10f;
+		public float ThrowSpeed = 30f;
+		public Entity FollowTarget;
 	}
 }

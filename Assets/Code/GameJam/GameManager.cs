@@ -16,7 +16,6 @@ namespace GameJam
             Game.Camera = Camera.main;
             Game.UI = FindObjectOfType<GameUI>();
             Game.State = new GameState();
-            Game.Astar = FindObjectOfType<AstarPath>();
 
 	        _machine = new GameStateMachine(true, Game);
         }
@@ -28,7 +27,7 @@ namespace GameJam
 
         private void Update()
         {
-			_machine.Tick();
+			_machine?.Tick();
         }
     }
 }

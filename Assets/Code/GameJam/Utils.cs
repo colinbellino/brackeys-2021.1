@@ -17,23 +17,45 @@ namespace GameJam
 			return manager.Game;
 		}
 
-        public static Entity SpawnUnit(EntityComponent prefab, Game game, string name, Vector3 position)
+        public static Unit SpawnUnit(EntityComponent prefab, Game game, UnitSpawner spawner)
         {
-	        var component = GameObject.Instantiate(prefab, position, Quaternion.identity);
-	        component.gameObject.name = name;
-	        var entity = new Unit { Name = name, Component = component };
-	        entity.StateMachine = new UnitStateMachine(false, game, entity);
+	        var component = GameObject.Instantiate(prefab, spawner.transform.position, Quaternion.identity);
+	        var entity = new Unit { Name = component.name, Component = component };
+	        entity.StateMachine = new UnitStateMachine(true, game, entity);
 	        entity.StateMachine.Start();
+	        SelectCharacter(component, false);
+	        SetDebugText(component, "");
+	        GameObject.Destroy(spawner.gameObject);
 	        return entity;
         }
 
-        public static Entity SpawnObstacle(EntityComponent prefab, Game game, string name, Vector3 position, int requiredUnits, int duration, Vector3 destination)
+        public static Unit SpawnLeader(EntityComponent prefab, Game game, LeaderSpawner spawner)
         {
-	        var component = GameObject.Instantiate(prefab, position, Quaternion.identity);
-	        component.gameObject.name = name;
-	        var entity = new Obstacle { Name = name, Component = component, RequiredUnits = requiredUnits, Duration = duration, PushDestination = destination};
+	        var component = GameObject.Instantiate(prefab, spawner.transform.position, Quaternion.identity);
+	        component.transform.name = "Leader";
+	        var entity = new Unit { Name = component.transform.name, Component = component };
+	        entity.StateMachine = new UnitStateMachine(false, game, entity);
+	        entity.StateMachine.Start();
+	        SelectCharacter(component, false);
+	        SetDebugText(component, "");
+	        GameObject.Destroy(spawner.gameObject);
+	        return entity;
+        }
+
+        public static Obstacle SpawnObstacle(EntityComponent prefab, Game game, ObstacleSpawner spawner)
+        {
+	        var component = GameObject.Instantiate(prefab, spawner.transform.position, Quaternion.identity);
+	        var entity = new Obstacle
+	        {
+		        Name = component.transform.name, Component = component,
+		        RequiredUnits = spawner.RequiredUnits, Duration = spawner.Duration,
+		        PushDestination = spawner.PushDestination,
+	        };
 	        entity.StateMachine = new ObstacleStateMachine(false, game, entity);
 	        entity.StateMachine.Start();
+	        SelectCharacter(component, false);
+	        SetDebugText(component, "");
+	        GameObject.Destroy(spawner.gameObject);
 	        return entity;
         }
 
@@ -92,13 +114,68 @@ namespace GameJam
 	        if (Vector3.Distance(entity.Component.RootTransform.position, destination) > Entity.MIN_MOVE_DISTANCE)
 	        {
 		        entity.MoveDestination = destination;
-		        entity.StateMachine.Fire(UnitStateMachine.Triggers.StartMoving);
+		        entity.StateMachine.Fire(UnitStateMachine.Triggers.Thrown);
 	        }
         }
 
         public static Entity GetEntity(List<Entity> entities, EntityComponent component)
         {
 	        return entities.Find(character => character.Component == component);
+        }
+
+        public static Unit GetEntity(List<Unit> entities, EntityComponent component)
+        {
+	        return entities.Find(character => character.Component == component);
+        }
+
+        public static Obstacle GetEntity(List<Obstacle> entities, EntityComponent component)
+        {
+	        return entities.Find(character => character.Component == component);
+        }
+
+        public static Vector3 GetMouseWorldPosition(GameControls controls, Camera camera)
+        {
+	        var mousePosition = controls.Gameplay.MousePosition.ReadValue<Vector2>();
+	        var mouseWorldPosition = camera.ScreenToWorldPoint(mousePosition);
+	        mouseWorldPosition.z = 0f;
+	        return mouseWorldPosition;
+        }
+
+        public static void TryPushObstacles(Unit actor, Game game)
+        {
+	        var hits = Physics2D.CircleCastAll(actor.Component.RootTransform.position, radius: 4f, Vector2.zero, 0f);
+	        foreach (var hit in hits)
+	        {
+		        var entityComponent = hit.transform.GetComponentInParent<EntityComponent>();
+		        var obstacle = GetEntity(game.State.Obstacles, entityComponent);
+		        if (obstacle != null)
+		        {
+			        if (obstacle.StateMachine.CanFire(ObstacleStateMachine.Triggers.StartMoving))
+			        {
+				        actor.ActionTarget = obstacle;
+				        obstacle.StateMachine.Fire(ObstacleStateMachine.Triggers.StartMoving);
+				        actor.StateMachine.Fire(UnitStateMachine.Triggers.StartPushing);
+			        }
+		        }
+	        }
+        }
+
+        public static void TryFollowLeader(Unit actor, Game game)
+        {
+	        var hits = Physics2D.CircleCastAll(actor.Component.RootTransform.position, radius: 3f, Vector2.zero, 0f);
+	        foreach (var hit in hits)
+	        {
+		        var entityComponent = hit.transform.GetComponentInParent<EntityComponent>();
+		        if (game.State.Leader.Component == entityComponent)
+		        {
+			        if (actor.StateMachine.CanFire(UnitStateMachine.Triggers.StartFollowing))
+			        {
+				        actor.FollowTarget = game.State.Leader;
+				        actor.StateMachine.Fire(UnitStateMachine.Triggers.StartFollowing);
+				        game.State.SelectedUnits.Enqueue(actor);
+			        }
+		        }
+	        }
         }
 	}
 }
