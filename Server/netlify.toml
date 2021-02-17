@@ -1,0 +1,9 @@
+[build]
+  command = "npm run build"
+  functions = "functions"
+  publish = "."
+
+#[dev]
+#  command = "npm run start"
+#  port = 3000
+#  publish = "dist"
