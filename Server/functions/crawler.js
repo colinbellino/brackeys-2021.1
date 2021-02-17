@@ -41,7 +41,7 @@ async function extractAuthors ()
         "Thea",
     ];
     let authors = [];
-    
+
     console.log(`Game: ${root.querySelector("h1.game_title").textContent}`);
 
     root.querySelector(".community_post_list_widget").childNodes.forEach(element =>
