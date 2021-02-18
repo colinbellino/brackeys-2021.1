@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Stateless;
+using UnityEngine;
 
 namespace GameJam
 {
@@ -63,7 +64,17 @@ namespace GameJam
 
 		public void Tick() => _currentState?.Tick();
 
-		public void Fire(Triggers trigger) => _machine.Fire(trigger);
+		public void Fire(Triggers trigger)
+		{
+			if (_machine.CanFire(trigger))
+			{
+				_machine.Fire(trigger);
+			}
+			else
+			{
+				Debug.LogWarning("Invalid transition " + _currentState + " -> " + trigger);
+			}
+		}
 
 		private async void OnTransitioned(StateMachine<States, Triggers>.Transition transition)
 		{

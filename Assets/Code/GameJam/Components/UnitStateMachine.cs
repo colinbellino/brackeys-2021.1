@@ -8,46 +8,38 @@ namespace GameJam
 {
 	public class UnitStateMachine
 	{
-		public enum States { Inactive, Idle, Following, Moving, Pushing }
-		public enum Triggers { Thrown, StartFollowing, StartPushing, Done }
+		public enum States { Inactive, IdleShooter, PlayerControlState, Destroy }
+		public enum Triggers { Done, Destroyed, ControlledByPlayer }
 
 		private readonly Dictionary<States, IState> _states;
 		private readonly StateMachine<States, Triggers> _machine;
 		private IState _currentState;
 		private readonly bool _debug;
-		private Unit _entity;
+		private EntityComponent _actor;
 
-		public UnitStateMachine(bool debug, Game game, Unit entity)
+		public UnitStateMachine(bool debug, Game game, EntityComponent actor)
 		{
 			_debug = debug;
-			_entity = entity;
+			_actor = actor;
 			_states = new Dictionary<States, IState>
 			{
-				{ States.Inactive, new InactiveState(this, game, entity) },
-				{ States.Idle, new IdleState(this, game, entity) },
-				{ States.Following, new FollowingState(this, game, entity) },
-				{ States.Moving, new ThrownState(this, game, entity) },
-				{ States.Pushing, new PushingState(this, game, entity) },
+				{ States.Inactive, new InactiveState(this, game, actor) },
+				{ States.PlayerControlState, new PlayerControlState(this, game, actor) },
+				{ States.IdleShooter, new IdleShooterState(this, game, actor) },
+				{ States.Destroy, new DestroyState(this, game, actor) },
 			};
 
 			_machine = new StateMachine<States, Triggers>(States.Inactive);
 
 			_machine.Configure(States.Inactive)
-				.Permit(Triggers.StartFollowing, States.Following);
+				.PermitDynamicIf(Triggers.Done, () => States.PlayerControlState, () => _actor.Brain == AI.None)
+				.PermitDynamicIf(Triggers.Done, () => States.IdleShooter, () => _actor.Brain == AI.IdleShooter);
 
-			_machine.Configure(States.Idle)
-				.Permit(Triggers.StartFollowing, States.Following)
-				.Permit(Triggers.StartPushing, States.Pushing);
+			_machine.Configure(States.IdleShooter)
+				.Permit(Triggers.Destroyed, States.Destroy);
 
-			_machine.Configure(States.Following)
-				.Permit(Triggers.Thrown, States.Moving);
-
-			_machine.Configure(States.Moving)
-				.Permit(Triggers.Done, States.Idle);
-
-			_machine.Configure(States.Pushing)
-				.Permit(Triggers.StartFollowing, States.Following)
-				.Permit(Triggers.Done, States.Idle);
+			_machine.Configure(States.PlayerControlState)
+				.Permit(Triggers.Destroyed, States.Destroy);
 
 			_machine.OnTransitioned(OnTransitioned);
 
@@ -58,9 +50,17 @@ namespace GameJam
 
 		public void Tick() => _currentState?.Tick();
 
-		public void Fire(Triggers trigger) => _machine.Fire(trigger);
-
-		public bool CanFire(Triggers trigger) => _machine.CanFire(trigger);
+		public void Fire(Triggers trigger)
+		{
+			if (_machine.CanFire(trigger))
+			{
+				_machine.Fire(trigger);
+			}
+			else
+			{
+				Debug.LogWarning("Invalid transition " + _currentState + " -> " + trigger);
+			}
+		}
 
 		private async void OnTransitioned(StateMachine<States, Triggers>.Transition transition)
 		{
@@ -73,14 +73,14 @@ namespace GameJam
 			{
 				if (_states.ContainsKey(transition.Destination) == false)
 				{
-					UnityEngine.Debug.LogError("Missing state class for: " + transition.Destination);
+					Debug.LogError("Missing state class for: " + transition.Destination);
 				}
 			}
 
 			_currentState = _states[transition.Destination];
 			if (_debug)
 			{
-				UnityEngine.Debug.Log($"{_entity}: {transition.Source} -> {transition.Destination}");
+				Debug.Log($"{_actor}: {transition.Source} -> {transition.Destination}");
 			}
 
 			await _currentState.Enter();
@@ -90,9 +90,9 @@ namespace GameJam
 		{
 			protected readonly UnitStateMachine _machine;
 			protected readonly Game _game;
-			protected readonly Unit _actor;
+			protected readonly EntityComponent _actor;
 
-			protected BaseEntityState(UnitStateMachine machine, Game game, Unit actor)
+			protected BaseEntityState(UnitStateMachine machine, Game game, EntityComponent actor)
 			{
 				_machine = machine;
 				_game = game;
@@ -105,106 +105,85 @@ namespace GameJam
 
 			public virtual void Tick()
 			{
-				SetDebugText(_actor.Component, $"{GetType().Name}");
+				SetDebugText(_actor, $"{GetType().Name}");
 			}
 		}
 
 		private class InactiveState : BaseEntityState
 		{
-			public InactiveState(UnitStateMachine machine, Game game, Unit actor) : base(machine, game, actor) { }
-
-			public override void Tick()
-			{
-				base.Tick();
-
-				TryFollowLeader(_actor, _game);
-			}
-		}
-
-		private class IdleState : BaseEntityState
-		{
-			public IdleState(UnitStateMachine machine, Game game, Unit actor) : base(machine, game, actor) { }
-
-			public override void Tick()
-			{
-				base.Tick();
-
-				_actor.Component.Rigidbody.velocity = Vector3.zero;
-
-				TryPushObstacles(_actor, _game);
-				TryFollowLeader(_actor, _game);
-			}
-		}
-
-		private class FollowingState : BaseEntityState
-		{
-			public FollowingState(UnitStateMachine machine, Game game, Unit actor) : base(machine, game, actor) { }
-
-			public override void Tick()
-			{
-				base.Tick();
-
-				var difference = _actor.FollowTarget.Component.RootTransform.position - _actor.Component.RootTransform.transform.position;
-				if (difference.magnitude > Entity.MIN_FOLLOW_DISTANCE)
-				{
-					_actor.Component.RootTransform.transform.position = Vector3.Lerp(
-						_actor.Component.RootTransform.transform.position,
-						_actor.Component.RootTransform.transform.position + difference.normalized,
-						Time.deltaTime * _actor.MoveSpeed
-					);
-				}
-			}
-		}
-
-		private class ThrownState : BaseEntityState
-		{
-			public ThrownState(UnitStateMachine machine, Game game, Unit actor) : base(machine, game, actor) { }
-
-			public override void Tick()
-			{
-				base.Tick();
-
-				var difference = _actor.MoveDestination - _actor.Component.RootTransform.transform.position;
-				_actor.Component.Rigidbody.MovePosition(_actor.Component.RootTransform.transform.position + difference.normalized * (Time.fixedDeltaTime * _actor.ThrowSpeed));
-
-				// TODO: stop if we hit a wall
-
-				if (Vector3.Distance(_actor.Component.RootTransform.position, _actor.MoveDestination) <= 0.1f)
-				{
-					_machine.Fire(Triggers.Done);
-				}
-			}
-		}
-
-		private class PushingState : BaseEntityState
-		{
-			public PushingState(UnitStateMachine machine, Game game, Unit actor) : base(machine, game, actor) { }
+			public InactiveState(UnitStateMachine machine, Game game, EntityComponent actor) : base(machine, game, actor) { }
 
 			public override async UniTask Enter()
 			{
 				await base.Enter();
 
-				_actor.ActionTarget.PushedBy.Add(_actor);
+				_machine.Fire(Triggers.Done);
 			}
+		}
 
-			public override async UniTask Exit()
+		private class IdleShooterState : BaseEntityState
+		{
+			private float _activationTimestamp;
+
+			public IdleShooterState(UnitStateMachine machine, Game game, EntityComponent actor) : base(machine, game, actor) { }
+
+			public override async UniTask Enter()
 			{
-				await base.Exit();
+				await base.Enter();
 
-				_actor.ActionTarget.PushedBy.Remove(_actor);
-				_actor.ActionTarget = null;
+				_activationTimestamp = Time.time + 3f;
 			}
 
 			public override void Tick()
 			{
 				base.Tick();
 
-				TryFollowLeader(_actor, _game);
-
-				if (_actor.ActionTarget?.Progress >= _actor.ActionTarget?.Duration)
+				if (Time.time >= _activationTimestamp)
 				{
-					_machine.Fire(Triggers.Done);
+					_actor.transform.Rotate(_actor.RotationPerTick * Time.deltaTime);
+
+					_actor.Rigidbody.velocity = Vector3.zero;
+					FireProjectile(_actor, _game.State);
 				}
+			}
+		}
+
+		private class PlayerControlState : BaseEntityState
+		{
+			public PlayerControlState(UnitStateMachine machine, Game game, EntityComponent actor) : base(machine, game, actor) { }
+
+			public override void Tick()
+			{
+				base.Tick();
+
+				var mouseWorldPosition = GetMouseWorldPosition(_game.Controls, _game.Camera);
+				var moveInput = _game.Controls.Gameplay.Move.ReadValue<Vector2>();
+				var confirmInput = _game.Controls.Gameplay.Confirm.ReadValue<float>();
+
+				_actor.Rigidbody.velocity = Vector3.zero;
+				_actor.transform.position = Vector3.Lerp(
+					_actor.transform.position,
+					_actor.transform.position + new Vector3(moveInput.x, moveInput.y, 0f),
+					_actor.MoveSpeed * Time.deltaTime
+				);
+				_actor.transform.up = mouseWorldPosition - _actor.transform.position;
+
+				if (confirmInput > 0f)
+				{
+					FireProjectile(_actor, _game.State);
+				}
+			}
+		}
+
+		private class DestroyState : BaseEntityState
+		{
+			public DestroyState(UnitStateMachine machine, Game game, EntityComponent actor) : base(machine, game, actor) { }
+
+			public override async UniTask Enter()
+			{
+				await base.Enter();
+
+				GameObject.Destroy(_actor.gameObject);
 			}
 		}
 	}
