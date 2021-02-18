@@ -27,7 +27,6 @@ namespace GameJam
 	        entity.MoveDestination = spawner.transform.position;
 	        entity.Health = entity.StartingHealth;
 	        await entity.StateMachine.Start();
-	        SelectCharacter(entity, false);
 	        SetDebugText(entity, "");
 	        return entity;
         }
@@ -39,7 +38,6 @@ namespace GameJam
 	        entity.Health = entity.StartingHealth;
 	        entity.StateMachine = new UnitStateMachine(false, game, entity);
 	        await entity.StateMachine.Start();
-	        SelectCharacter(entity, false);
 	        SetDebugText(entity, "");
 	        return entity;
         }
@@ -67,14 +65,6 @@ namespace GameJam
 	        return (origin, size);
         }
 
-        public static void SelectCharacter(EntityComponent entity, bool value)
-        {
-	        if (entity.Selection != null)
-	        {
-		        entity.Selection.SetActive(value);
-	        }
-        }
-
         public static void SetDebugText(EntityComponent entityComponent, string value)
         {
 	        if (entityComponent.DebugText != null)
@@ -98,10 +88,15 @@ namespace GameJam
 		        return;
 	        }
 
-	        var projectile = GameObject.Instantiate(entity.ProjectilePrefab, entity.transform.position, entity.transform.rotation);
-	        projectile.Alliance = entity.Alliance;
 
-	        state.Projectiles.Add(projectile);
+	        var shooters = entity.GetComponentsInChildren<ShooterComponent>();
+	        foreach (var shooter in shooters)
+	        {
+		        var projectile = GameObject.Instantiate(shooter.ProjectilePrefab, shooter.transform.position, shooter.transform.rotation);
+		        projectile.Alliance = entity.Alliance;
+
+		        state.Projectiles.Add(projectile);
+	        }
 
 	        entity.CanFireTimestamp = Time.time + entity.FireRate;
         }

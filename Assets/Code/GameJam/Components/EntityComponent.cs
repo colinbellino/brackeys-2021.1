@@ -12,10 +12,8 @@ namespace GameJam
 		public static float MIN_MOVE_DISTANCE = 3f;
 		public static float MIN_FOLLOW_DISTANCE = 1f;
 
-		[SerializeField] public GameObject Selection;
 		[SerializeField] public Text DebugText;
 		[SerializeField] public Rigidbody2D Rigidbody;
-		[SerializeField] public ProjectileComponent ProjectilePrefab;
 		[SerializeField] public float FireRate = 0.1f;
 		[SerializeField] public float MoveSpeed = 10f;
 		[SerializeField] public int StartingHealth = 3;
