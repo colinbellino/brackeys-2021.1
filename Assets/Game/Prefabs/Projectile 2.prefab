@@ -47,6 +47,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MoveSpeed: 10
+  CanBeDestroyed: 1
   Alliance: 0
 --- !u!50 &3506903381490450493
 Rigidbody2D:

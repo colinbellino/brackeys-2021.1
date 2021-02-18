@@ -5,6 +5,7 @@ namespace GameJam
 	public class ProjectileComponent : MonoBehaviour
 	{
 		[SerializeField] public float MoveSpeed = 10f;
+		[SerializeField] public bool CanBeDestroyed;
 
 		[HideInInspector] public Alliances Alliance;
 
@@ -23,6 +24,13 @@ namespace GameJam
 			if (entity != null && entity.Alliance != Alliance)
 			{
 				Hit(entity, this);
+				return;
+			}
+
+			var projectile = other.GetComponentInParent<ProjectileComponent>();
+			if (projectile != null && projectile.CanBeDestroyed && projectile.Alliance != Alliance)
+			{
+				Destroy(projectile.gameObject);
 			}
 		}
 
