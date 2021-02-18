@@ -9,7 +9,7 @@ namespace GameJam
 {
 	public class GameplayState : BaseGameState
 	{
-		private bool _loaded;
+		private double _startedTimestamp;
 		public GameplayState(GameStateMachine machine, Game game) : base(machine, game) { }
 
 		public override async UniTask Enter()
@@ -24,11 +24,7 @@ namespace GameJam
 			{
 				var spawner = GameObject.FindObjectOfType<LeaderSpawner>();
 				_state.Leader = await SpawnLeader(_config.LeaderPrefab, _game, spawner);
-			}
-
-			foreach (var spawner in GameObject.FindObjectsOfType<UnitSpawner>())
-			{
-				_state.Units.Add(await SpawnUnit(_config.UnitPrefab, _game, spawner));
+				GameObject.Destroy(spawner.gameObject);
 			}
 
 			_ui.ShowGameplay();
@@ -38,7 +34,7 @@ namespace GameJam
 			_controls.Gameplay.Confirm.performed += OnConfirmReleased;
 			_controls.Gameplay.Cancel.performed += OnCancelReleased;
 
-			_loaded = true;
+			_startedTimestamp = Time.time;
 		}
 
 		public override async UniTask Exit()
@@ -73,16 +69,25 @@ namespace GameJam
 			_controls.Gameplay.Confirm.performed -= OnConfirmReleased;
 			_controls.Gameplay.Cancel.performed -= OnCancelReleased;
 
-			_loaded = false;
+			_startedTimestamp = 0f;
 		}
 
-		public override void Tick()
+		public override async void Tick()
 		{
 			base.Tick();
 
-			if (_loaded == false)
+			if (_startedTimestamp == 0f)
 			{
 				return;
+			}
+
+			foreach (var spawner in GameObject.FindObjectsOfType<UnitSpawner>())
+			{
+				if (Time.time >= _startedTimestamp + spawner.Delay)
+				{
+					_state.Units.Add(await SpawnUnit(spawner.UnitPrefab, _game, spawner));
+					GameObject.Destroy(spawner.gameObject);
+				}
 			}
 
 			if (_state.Leader == null)

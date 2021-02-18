@@ -26,6 +26,7 @@ namespace GameJam
 		[HideInInspector] public int Health = 1	;
 		[HideInInspector] public float CanFireTimestamp;
 		[HideInInspector] public UnitStateMachine StateMachine;
+		[HideInInspector] public Vector3 MoveDestination;
 
 		public override string ToString() => name;
 	}

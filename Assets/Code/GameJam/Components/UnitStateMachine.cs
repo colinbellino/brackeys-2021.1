@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using DG.Tweening;
 using Stateless;
 using UnityEngine;
 using static GameJam.Utils;
@@ -123,7 +124,7 @@ namespace GameJam
 
 		private class IdleShooterState : BaseEntityState
 		{
-			private float _activationTimestamp;
+			private bool _activated;
 
 			public IdleShooterState(UnitStateMachine machine, Game game, EntityComponent actor) : base(machine, game, actor) { }
 
@@ -131,15 +132,17 @@ namespace GameJam
 			{
 				await base.Enter();
 
-				_activationTimestamp = Time.time + 3f;
+				await MoveInPosition(_actor);
 				_actor.transform.up = _game.State.Leader.transform.position - _actor.transform.position;
+
+				_activated = true;
 			}
 
 			public override void Tick()
 			{
 				base.Tick();
 
-				if (Time.time >= _activationTimestamp)
+				if (_activated)
 				{
 					_actor.transform.Rotate(_actor.RotationPerTick * Time.deltaTime);
 
