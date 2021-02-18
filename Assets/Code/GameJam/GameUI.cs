@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 using Button = UnityEngine.UI.Button;
@@ -46,12 +45,12 @@ namespace GameJam
 		public void ShowDefeat() { _defeatRoot.SetActive(true); }
 		public void HideDefeat() { _defeatRoot.SetActive(false); }
 
-		public void SetSelectedUnits(List<Unit> units)
+		public void SetSelectedUnits(List<EntityComponent> units)
 		{
 			_debugText.text = "Selected characters:\n";
 			foreach (var unit in units)
 			{
-				_debugText.text += $"- {unit.Name}\n";
+				_debugText.text += $"- {unit.name}\n";
 			}
 		}
 
