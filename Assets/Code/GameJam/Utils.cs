@@ -1,5 +1,6 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
+using DG.Tweening;
 using UnityEngine;
 
 namespace GameJam
@@ -19,13 +20,15 @@ namespace GameJam
 
         public static async UniTask<EntityComponent> SpawnUnit(EntityComponent prefab, Game game, UnitSpawner spawner)
         {
-	        var entity = GameObject.Instantiate(prefab, spawner.transform.position, Quaternion.identity);
+	        var origin = spawner.transform.position;
+	        origin.y = 23;
+	        var entity = GameObject.Instantiate(prefab, origin, Quaternion.identity);
 	        entity.StateMachine = new UnitStateMachine(true, game, entity);
+	        entity.MoveDestination = spawner.transform.position;
 	        entity.Health = entity.StartingHealth;
 	        await entity.StateMachine.Start();
 	        SelectCharacter(entity, false);
 	        SetDebugText(entity, "");
-	        GameObject.Destroy(spawner.gameObject);
 	        return entity;
         }
 
@@ -38,7 +41,6 @@ namespace GameJam
 	        await entity.StateMachine.Start();
 	        SelectCharacter(entity, false);
 	        SetDebugText(entity, "");
-	        GameObject.Destroy(spawner.gameObject);
 	        return entity;
         }
 
@@ -102,6 +104,11 @@ namespace GameJam
 	        state.Projectiles.Add(projectile);
 
 	        entity.CanFireTimestamp = Time.time + entity.FireRate;
+        }
+
+        public static async UniTask MoveInPosition(EntityComponent entity)
+        {
+	        await entity.transform.DOMove(entity.MoveDestination, 2f).SetEase(Ease.InSine);
         }
 	}
 }
