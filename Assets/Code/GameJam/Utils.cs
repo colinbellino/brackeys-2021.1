@@ -21,6 +21,7 @@ namespace GameJam
         {
 	        var entity = GameObject.Instantiate(prefab, spawner.transform.position, Quaternion.identity);
 	        entity.StateMachine = new UnitStateMachine(true, game, entity);
+	        entity.Health = entity.StartingHealth;
 	        await entity.StateMachine.Start();
 	        SelectCharacter(entity, false);
 	        SetDebugText(entity, "");
@@ -32,6 +33,7 @@ namespace GameJam
         {
 	        var entity = GameObject.Instantiate(prefab, spawner.transform.position, Quaternion.identity);
 	        entity.transform.name = "Leader";
+	        entity.Health = entity.StartingHealth;
 	        entity.StateMachine = new UnitStateMachine(false, game, entity);
 	        await entity.StateMachine.Start();
 	        SelectCharacter(entity, false);

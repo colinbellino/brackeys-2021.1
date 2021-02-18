@@ -302,7 +302,7 @@ GameObject:
   - component: {fileID: 4246819502291371097}
   - component: {fileID: 305933623984123124}
   m_Layer: 0
-  m_Name: Unit
+  m_Name: Idle Shooter
   m_TagString: Untagged
   m_Icon: {fileID: 3936346786652291628, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
@@ -346,9 +346,10 @@ MonoBehaviour:
   ProjectilePrefab: {fileID: 2322674617563913610, guid: a297dd152cff6aa45ba6dbc73f71b0e9, type: 3}
   FireRate: 0.3
   MoveSpeed: 10
+  StartingHealth: 10
   Alliance: 0
   Brain: 1
-  RotationPerTick: {x: 0, y: 0, z: 20}
+  RotationPerTick: {x: 0, y: 0, z: 30}
   Health: 1
   CanFireTimestamp: 0
 --- !u!50 &305933623984123124

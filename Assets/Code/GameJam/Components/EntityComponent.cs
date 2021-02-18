@@ -18,6 +18,7 @@ namespace GameJam
 		[SerializeField] public ProjectileComponent ProjectilePrefab;
 		[SerializeField] public float FireRate = 0.1f;
 		[SerializeField] public float MoveSpeed = 10f;
+		[SerializeField] public int StartingHealth = 3;
 		[SerializeField] public Alliances Alliance;
 		[SerializeField] public AI Brain;
 		[SerializeField] public Vector3 RotationPerTick;
@@ -28,37 +29,4 @@ namespace GameJam
 
 		public override string ToString() => name;
 	}
-
-	// public class Entity
-	// {
-	// 	public static float MIN_MOVE_DISTANCE = 3f;
-	// 	public static float MIN_FOLLOW_DISTANCE = 1f;
-	//
-	// 	public string Name;
-	// 	public EntityComponent Component;
-	// 	public float CanFireTimestamp;
-	// 	public float MoveSpeed = 10f;
-	//
-	// 	public override string ToString() => Name;
-	// }
-	//
-	// public class Obstacle : Entity
-	// {
-	// 	public int RequiredUnits;
-	// 	public float Duration;
-	// 	public float Progress;
-	// 	public Vector3 PushDestination;
-	// 	public ObstacleStateMachine StateMachine;
-	// 	public List<Entity> PushedBy = new List<Entity>();
-	// }
-	//
-	// public class Unit : Entity
-	// {
-	// 	public Vector3 MoveDestination;
-	// 	public Obstacle ActionTarget;
-	// 	public UnitStateMachine StateMachine;
-	//
-	// 	public float ThrowSpeed = 30f;
-	// 	public Entity FollowTarget;
-	// }
 }

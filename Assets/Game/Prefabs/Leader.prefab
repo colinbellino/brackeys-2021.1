@@ -359,8 +359,9 @@ MonoBehaviour:
   DebugText: {fileID: 8106252740773746065}
   Rigidbody: {fileID: 9131346481287055337}
   ProjectilePrefab: {fileID: 2322674617563913610, guid: 7220f06d60796dd45b11a42858fd38a3, type: 3}
-  FireRate: 0.1
+  FireRate: 0.11
   MoveSpeed: 10
+  StartingHealth: 3
   Alliance: 1
   Brain: 0
   RotationPerTick: {x: 0, y: 0, z: 0}

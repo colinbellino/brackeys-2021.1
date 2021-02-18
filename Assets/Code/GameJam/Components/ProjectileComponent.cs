@@ -23,18 +23,25 @@ namespace GameJam
 			var entity = other.GetComponentInParent<EntityComponent>();
 			if (entity != null && entity.Alliance != Alliance)
 			{
-				Hit(entity, this);
+				DestroyProjectile(this);
+				HitEntity(entity, this);
 				return;
 			}
 
 			var projectile = other.GetComponentInParent<ProjectileComponent>();
 			if (projectile != null && projectile.CanBeDestroyed && projectile.Alliance != Alliance)
 			{
-				Destroy(projectile.gameObject);
+				var shouldDestroySelf = Random.Range(0, 100) > 75;
+				if (shouldDestroySelf)
+				{
+					DestroyProjectile(this);
+				}
+
+				DestroyProjectile(projectile);
 			}
 		}
 
-		public static void Hit(EntityComponent entity, ProjectileComponent projectile)
+		public static void HitEntity(EntityComponent entity, ProjectileComponent projectile)
 		{
 			entity.Health -= 1;
 
@@ -42,6 +49,11 @@ namespace GameJam
 			{
 				entity.StateMachine.Fire(UnitStateMachine.Triggers.Destroyed);
 			}
+		}
+
+		public static void DestroyProjectile(ProjectileComponent component)
+		{
+			GameObject.Destroy(component.gameObject);
 		}
 	}
 }

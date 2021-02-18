@@ -132,6 +132,7 @@ namespace GameJam
 				await base.Enter();
 
 				_activationTimestamp = Time.time + 3f;
+				_actor.transform.up = _game.State.Leader.transform.position - _actor.transform.position;
 			}
 
 			public override void Tick()
