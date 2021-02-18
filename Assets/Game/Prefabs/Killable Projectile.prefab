@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 2322674617563913610}
   - component: {fileID: 3506903381490450493}
   m_Layer: 0
-  m_Name: Projectile 2
+  m_Name: Killable Projectile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -46,7 +46,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7e8cdb8faaec412eb7850c5500d728ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MoveSpeed: 10
+  MoveSpeed: 5
   CanBeDestroyed: 1
   Alliance: 0
 --- !u!50 &3506903381490450493
