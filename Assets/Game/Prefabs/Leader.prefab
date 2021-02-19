@@ -120,9 +120,9 @@ CircleCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: -0.5}
+  m_Offset: {x: 0, y: -0.25}
   serializedVersion: 2
-  m_Radius: 0.5
+  m_Radius: 0.25
 --- !u!1 &3113524809148162382
 GameObject:
   m_ObjectHideFlags: 0
@@ -249,7 +249,7 @@ Transform:
   m_GameObject: {fileID: 3434725957668814172}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 2, y: 2, z: 1}
+  m_LocalScale: {x: 1.5, y: 1.5, z: 1}
   m_Children: []
   m_Father: {fileID: 4641049481721966405}
   m_RootOrder: 0
@@ -559,4 +559,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de777c7663ee4618aa211ab9ae74d0df, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ProjectilePrefab: {fileID: 2322674617563913610, guid: 7220f06d60796dd45b11a42858fd38a3, type: 3}
+  Projectile: {fileID: 11400000, guid: 1509a947999ef2f4a92aed9fc83f30b6, type: 2}

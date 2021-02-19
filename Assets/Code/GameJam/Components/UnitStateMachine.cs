@@ -147,7 +147,7 @@ namespace GameJam
 					_actor.transform.Rotate(_actor.RotationPerTick * Time.deltaTime);
 
 					_actor.Rigidbody.velocity = Vector3.zero;
-					FireProjectile(_actor, _game.State);
+					FireProjectile(_actor, _game.State, _game.ProjectileSpawner);
 				}
 			}
 		}
@@ -174,7 +174,7 @@ namespace GameJam
 
 				if (confirmInput > 0f)
 				{
-					FireProjectile(_actor, _game.State);
+					FireProjectile(_actor, _game.State, _game.ProjectileSpawner);
 				}
 			}
 		}

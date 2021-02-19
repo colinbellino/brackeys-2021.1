@@ -81,7 +81,7 @@ namespace GameJam
 	        return mouseWorldPosition;
         }
 
-        public static void FireProjectile(EntityComponent entity, GameState state)
+        public static void FireProjectile(EntityComponent entity, GameState state, ProjectileSpawner projectileSpawner)
         {
 	        if (Time.time < entity.CanFireTimestamp)
 	        {
@@ -92,9 +92,8 @@ namespace GameJam
 	        var shooters = entity.GetComponentsInChildren<ShooterComponent>();
 	        foreach (var shooter in shooters)
 	        {
-		        var projectile = GameObject.Instantiate(shooter.ProjectilePrefab, shooter.transform.position, shooter.transform.rotation);
-		        projectile.Alliance = entity.Alliance;
-
+		        var projectile = projectileSpawner.Spawn(entity, shooter);
+		        projectile.Destroyed += () => projectileSpawner.Despawn(projectile);
 		        state.Projectiles.Add(projectile);
 	        }
 

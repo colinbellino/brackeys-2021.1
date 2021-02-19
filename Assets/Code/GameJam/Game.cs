@@ -9,5 +9,6 @@ namespace GameJam
 		public Camera Camera;
 		public GameControls Controls;
 		public GameState State;
+		public ProjectileSpawner ProjectileSpawner;
 	}
 }

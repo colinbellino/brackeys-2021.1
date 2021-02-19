@@ -16,6 +16,7 @@ namespace GameJam
             Game.Camera = Camera.main;
             Game.UI = FindObjectOfType<GameUI>();
             Game.State = new GameState();
+            Game.ProjectileSpawner = new ProjectileSpawner();
 
 	        _machine = new GameStateMachine(true, Game);
         }

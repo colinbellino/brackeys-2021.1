@@ -6,5 +6,6 @@ namespace GameJam
 	public class GameConfig : ScriptableObject
 	{
 		public EntityComponent LeaderPrefab;
+		public ProjectileComponent DefaultProjectilePrefab;
 	}
 }

@@ -12,9 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9d9faba923454a5cad26655791da1fbd, type: 3}
   m_Name: Game Config
   m_EditorClassIdentifier: 
-  UnitPrefab: {fileID: 4246819502291371097, guid: d382ce520e6d21641b1264655066cf76, type: 3}
-  ObstaclePrefab: {fileID: 2218516013654545810, guid: 81e71b9986a295442ba62c7324fb3f2d, type: 3}
   LeaderPrefab: {fileID: 4641049481721966404, guid: 59f9ad7a458b4844e9ac659f97fe6cc4, type: 3}
-  SelectionMask:
-    serializedVersion: 2
-    m_Bits: 1
+  DefaultProjectilePrefab: {fileID: 2322674617563913610, guid: 7220f06d60796dd45b11a42858fd38a3, type: 3}

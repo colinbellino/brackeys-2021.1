@@ -27,6 +27,8 @@ namespace GameJam
 				GameObject.Destroy(spawner.gameObject);
 			}
 
+			_projectileSpawner.CreatePool(200, _config.DefaultProjectilePrefab);
+
 			_ui.ShowGameplay();
 
 			_controls.Gameplay.Enable();
@@ -56,10 +58,7 @@ namespace GameJam
 			}
 			foreach (var projectile in _state.Projectiles)
 			{
-				if (projectile != null)
-				{
-					GameObject.Destroy(projectile.gameObject);
-				}
+				_projectileSpawner.Despawn(projectile);
 			}
 
 			_ui.HideGameplay();
