@@ -14,35 +14,45 @@ namespace GameJam
 		{
 			await base.Enter();
 
+			_state.DeathCounter += 1;
+
 			_helpers = await Utils.LoadHelpers();
 
 			_ui.ShowGiveUp();
-			_ui.GiveUpYesButton.onClick.AddListener(GiveUpYesClicked);
-			_ui.GiveUpNoButton.onClick.AddListener(GiveUpNoClicked);
+			_ui.GiveUpYesButton.onClick.AddListener(GiveUp);
+			_ui.GiveUpNoButton.onClick.AddListener(Continue);
 		}
 
 		public override async UniTask Exit()
 		{
 			await base.Exit();
 
-			_ui.GiveUpYesButton.onClick.RemoveListener(GiveUpYesClicked);
-			_ui.GiveUpNoButton.onClick.RemoveListener(GiveUpNoClicked);
+			_ui.GiveUpYesButton.onClick.RemoveListener(GiveUp);
+			_ui.GiveUpNoButton.onClick.RemoveListener(Continue);
+			_ui.ReceiveHelpYesButton.onClick.RemoveListener(RestartWithHelp);
+			_ui.ReceiveHelpNoButton.onClick.RemoveListener(RestartWithoutHelp);
 		}
 
-		private void GiveUpYesClicked()
+		private void GiveUp()
 		{
 			_machine.Fire(GameStateMachine.Triggers.Quit);
 		}
 
-		private void GiveUpNoClicked()
+		private void Continue()
 		{
 			_ui.HideGiveUp();
+			if (_state.DeathCounter < 3)
+			{
+				RestartWithoutHelp();
+				return;
+			}
+
 			_ui.ShowReceiveHelp(_helpers[0]);
-			_ui.ReceiveHelpYesButton.onClick.AddListener(ReceiveHelpYesClicked);
-			_ui.ReceiveHelpNoButton.onClick.AddListener(ReceiveHelpNoClicked);
+			_ui.ReceiveHelpYesButton.onClick.AddListener(RestartWithHelp);
+			_ui.ReceiveHelpNoButton.onClick.AddListener(RestartWithoutHelp);
 		}
 
-		private async void ReceiveHelpYesClicked()
+		private async void RestartWithHelp()
 		{
 			Debug.Log("Accepted help.");
 			_state.Helpers = _helpers;
@@ -53,7 +63,7 @@ namespace GameJam
 			_machine.Fire(GameStateMachine.Triggers.Retry);
 		}
 
-		private async void ReceiveHelpNoClicked()
+		private async void RestartWithoutHelp()
 		{
 			_ui.HideReceiveHelp();
 

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 namespace GameJam
 {
@@ -36,10 +35,6 @@ namespace GameJam
 	        var entity = GameObject.Instantiate(prefab, spawner.transform.position, Quaternion.identity);
 	        entity.transform.name = "Leader";
 	        entity.Health = entity.StartingHealth;
-	   //      if (game.State.Helpers.Count > 0)
-	   //      {
-				// entity.Health += 5;
-	   //      }
 	        entity.StateMachine = new UnitStateMachine(false, game, entity);
 	        await entity.StateMachine.Start();
 	        return entity;

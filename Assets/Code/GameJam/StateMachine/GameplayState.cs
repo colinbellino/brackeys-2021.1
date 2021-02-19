@@ -2,7 +2,6 @@
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.SceneManagement;
 using static GameJam.Utils;
 
 namespace GameJam
@@ -21,24 +20,13 @@ namespace GameJam
 			_state.Projectiles.Clear();
 			_state.Waves = new Queue<Wave>(_config.Waves);
 
-			if (IsDevBuild())
-			{
-				if (SceneManager.sceneCount > 1)
-				{
-					await SceneManager.UnloadSceneAsync("Level");
-				}
-			}
-			await SceneManager.LoadSceneAsync("Level", LoadSceneMode.Additive);
-
 			{
 				var spawner = GameObject.FindObjectOfType<LeaderSpawner>();
 				_state.Leader = await SpawnLeader(_config.LeaderPrefab, _game, spawner);
-				GameObject.Destroy(spawner.gameObject);
 			}
 
-			_projectileSpawner.CreatePool(200, _config.DefaultProjectilePrefab);
-
 			_ui.ShowGameplay();
+			_ui.SetDebugText("");
 
 			_controls.Gameplay.Enable();
 			_controls.Gameplay.Confirm.performed += OnConfirmPerformed;
@@ -111,8 +99,6 @@ namespace GameJam
 			await base.Exit();
 
 			await _ui.StartFadeToBlack();
-
-			await SceneManager.UnloadSceneAsync("Level");
 
 			if (_state.Leader != null)
 			{
