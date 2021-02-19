@@ -502,12 +502,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DebugText: {fileID: 790623453166190220}
   Rigidbody: {fileID: 305933623984123124}
-  FireRate: 0.4
+  FireRate: 0.5
   MoveSpeed: 10
   StartingHealth: 10
   Alliance: 0
   Brain: 1
-  RotationPerTick: {x: 0, y: 0, z: 30}
+  RotationPerTick: {x: 0, y: 0, z: 10}
   Health: 1
   CanFireTimestamp: 0
   MoveDestination: {x: 0, y: 0, z: 0}
