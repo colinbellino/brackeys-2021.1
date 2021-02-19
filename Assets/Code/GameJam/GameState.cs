@@ -9,5 +9,6 @@ namespace GameJam
 		public readonly List<ProjectileComponent> Projectiles = new List<ProjectileComponent>();
 		public Queue<Wave> Waves;
 		public List<string> Helpers = new List<string>();
+		public int DeathCounter;
 	}
 }
