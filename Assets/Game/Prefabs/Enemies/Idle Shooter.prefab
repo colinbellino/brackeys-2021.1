@@ -126,7 +126,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de777c7663ee4618aa211ab9ae74d0df, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ProjectilePrefab: {fileID: 2322674617563913610, guid: a297dd152cff6aa45ba6dbc73f71b0e9, type: 3}
+  Projectile: {fileID: 11400000, guid: be464f8ec68e3da4fa482a771e4ad24c, type: 2}
 --- !u!212 &1116039162044336810
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -301,7 +301,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de777c7663ee4618aa211ab9ae74d0df, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ProjectilePrefab: {fileID: 2322674617563913610, guid: 28ea94452088b414db72e85972bf3c78, type: 3}
+  Projectile: {fileID: 11400000, guid: e0ddf1ce2bd4da74391011340a8bd4ba, type: 2}
 --- !u!212 &7755789029436818358
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -397,7 +397,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de777c7663ee4618aa211ab9ae74d0df, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ProjectilePrefab: {fileID: 2322674617563913610, guid: 28ea94452088b414db72e85972bf3c78, type: 3}
+  Projectile: {fileID: 11400000, guid: e0ddf1ce2bd4da74391011340a8bd4ba, type: 2}
 --- !u!212 &3402674231446917390
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -502,7 +502,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DebugText: {fileID: 790623453166190220}
   Rigidbody: {fileID: 305933623984123124}
-  FireRate: 0.3
+  FireRate: 0.4
   MoveSpeed: 10
   StartingHealth: 10
   Alliance: 0
@@ -576,7 +576,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de777c7663ee4618aa211ab9ae74d0df, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ProjectilePrefab: {fileID: 2322674617563913610, guid: a297dd152cff6aa45ba6dbc73f71b0e9, type: 3}
+  Projectile: {fileID: 11400000, guid: be464f8ec68e3da4fa482a771e4ad24c, type: 2}
 --- !u!212 &5217595237607567248
 SpriteRenderer:
   m_ObjectHideFlags: 0

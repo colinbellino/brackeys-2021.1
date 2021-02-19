@@ -4,7 +4,7 @@ namespace GameJam
 {
 	public class ShooterComponent : MonoBehaviour
 	{
-		[SerializeField] public ProjectileComponent ProjectilePrefab;
+		[SerializeField] public Projectile Projectile;
 
 		private void Awake()
 		{

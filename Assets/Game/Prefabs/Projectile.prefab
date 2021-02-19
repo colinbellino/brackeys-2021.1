@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 2322674617563913610}
   - component: {fileID: 3506903381490450493}
   m_Layer: 0
-  m_Name: Unkillable Projectile
+  m_Name: Projectile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -46,9 +46,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7e8cdb8faaec412eb7850c5500d728ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MoveSpeed: 5
-  CanBeDestroyed: 0
+  SpriteRenderer: {fileID: 1098369176765757369}
+  HitColliderRadius: {fileID: 301398324204585726}
   Alliance: 0
+  Data: {fileID: 0}
 --- !u!50 &3506903381490450493
 Rigidbody2D:
   serializedVersion: 4
@@ -141,8 +142,8 @@ SpriteRenderer:
   m_SortingLayerID: 1463812865
   m_SortingLayer: 1
   m_SortingOrder: 0
-  m_Sprite: {fileID: 3286163911610860551, guid: 8387eabf456116643814e39befe03c07, type: 3}
-  m_Color: {r: 1, g: 0, b: 0.018845558, a: 1}
+  m_Sprite: {fileID: 3286163911610860551, guid: 2f0854bd1e26b7048b2e8e96b681132a, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -161,7 +162,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8607211688812955425}
-  - component: {fileID: 6171049827880843970}
+  - component: {fileID: 301398324204585726}
   m_Layer: 10
   m_Name: Hit Collider
   m_TagString: Untagged
@@ -183,7 +184,7 @@ Transform:
   m_Father: {fileID: 2322674617563913611}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!58 &6171049827880843970
+--- !u!58 &301398324204585726
 CircleCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -193,9 +194,9 @@ CircleCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
-  m_Radius: 0.4
+  m_Radius: 0.5
