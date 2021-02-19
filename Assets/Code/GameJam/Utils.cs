@@ -1,6 +1,5 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
-using DG.Tweening;
 using UnityEngine;
 
 namespace GameJam
@@ -18,16 +17,15 @@ namespace GameJam
 			return manager.Game;
 		}
 
-        public static async UniTask<EntityComponent> SpawnUnit(EntityComponent prefab, Game game, UnitSpawner spawner)
+        public static async UniTask<EntityComponent> SpawnUnit(EntityComponent prefab, Game game, Vector3 position)
         {
-	        var origin = spawner.transform.position;
-	        origin.y = 23;
+	        var origin = position;
+	        origin.y = Game.Bounds.max.y;
 	        var entity = GameObject.Instantiate(prefab, origin, Quaternion.identity);
 	        entity.StateMachine = new UnitStateMachine(true, game, entity);
-	        entity.MoveDestination = spawner.transform.position;
+	        entity.MoveDestination = position;
 	        entity.Health = entity.StartingHealth;
 	        await entity.StateMachine.Start();
-	        SetDebugText(entity, "");
 	        return entity;
         }
 
@@ -38,7 +36,6 @@ namespace GameJam
 	        entity.Health = entity.StartingHealth;
 	        entity.StateMachine = new UnitStateMachine(false, game, entity);
 	        await entity.StateMachine.Start();
-	        SetDebugText(entity, "");
 	        return entity;
         }
 
@@ -65,14 +62,6 @@ namespace GameJam
 	        return (origin, size);
         }
 
-        public static void SetDebugText(EntityComponent entityComponent, string value)
-        {
-	        if (entityComponent.DebugText != null)
-	        {
-		        entityComponent.DebugText.text = value;
-	        }
-        }
-
         public static Vector3 GetMouseWorldPosition(GameControls controls, Camera camera)
         {
 	        var mousePosition = controls.Gameplay.MousePosition.ReadValue<Vector2>();
@@ -89,8 +78,7 @@ namespace GameJam
 	        }
 
 
-	        var shooters = entity.GetComponentsInChildren<ShooterComponent>();
-	        foreach (var shooter in shooters)
+	        foreach (var shooter in entity.Shooters)
 	        {
 		        var projectile = projectileSpawner.Spawn(entity, shooter);
 		        projectile.Destroyed += () => projectileSpawner.Despawn(projectile);
@@ -98,11 +86,6 @@ namespace GameJam
 	        }
 
 	        entity.CanFireTimestamp = Time.time + entity.FireRate;
-        }
-
-        public static async UniTask MoveInPosition(EntityComponent entity)
-        {
-	        await entity.transform.DOMove(entity.MoveDestination, 2f).SetEase(Ease.InSine);
         }
 	}
 }

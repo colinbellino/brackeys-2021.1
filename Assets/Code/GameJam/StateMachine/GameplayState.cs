@@ -10,6 +10,7 @@ namespace GameJam
 	public class GameplayState : BaseGameState
 	{
 		private double _startedTimestamp;
+
 		public GameplayState(GameStateMachine machine, Game game) : base(machine, game) { }
 
 		public override async UniTask Enter()
@@ -18,6 +19,7 @@ namespace GameJam
 
 			_state.Units = new List<EntityComponent>();
 			_state.Projectiles = new List<ProjectileComponent>();
+			_state.Waves = new Queue<Wave>(_config.Waves);
 
 			if (IsDevBuild())
 			{
@@ -46,6 +48,67 @@ namespace GameJam
 			_startedTimestamp = Time.time;
 		}
 
+		public override async void Tick()
+		{
+			base.Tick();
+
+			if (_startedTimestamp == 0f)
+			{
+				return;
+			}
+
+			for (var entityIndex = _state.Units.Count - 1; entityIndex >= 0; entityIndex--)
+			{
+				var entity = _state.Units[entityIndex];
+				if (entity == null)
+				{
+					_state.Units.RemoveAt(entityIndex);
+					continue;
+				}
+
+				entity.StateMachine.Tick();
+			}
+
+			if (_state.Units.Count == 0)
+			{
+				if (_state.Waves.Count == 0)
+				{
+					_machine.Fire(GameStateMachine.Triggers.Victory);
+					return;
+				}
+
+				var wave = _state.Waves.Dequeue();
+
+				foreach (var spawn in wave.Spawns)
+				{
+					var unit = await SpawnUnit(spawn.EntityPrefab, _game, spawn.Position);
+					_state.Units.Add(unit);
+				}
+			}
+
+			if (_state.Leader == null)
+			{
+				_machine.Fire(GameStateMachine.Triggers.Defeat);
+			}
+			else
+			{
+				_ui.SetDebugText($"Player health: {_state.Leader.Health}");
+				_state.Leader.StateMachine.Tick();
+			}
+
+			if (IsDevBuild())
+			{
+				if (Keyboard.current.f1Key.wasPressedThisFrame)
+				{
+					_machine.Fire(GameStateMachine.Triggers.Victory);
+				}
+				if (Keyboard.current.f2Key.wasPressedThisFrame)
+				{
+					_machine.Fire(GameStateMachine.Triggers.Defeat);
+				}
+			}
+		}
+
 		public override async UniTask Exit()
 		{
 			await base.Exit();
@@ -56,12 +119,10 @@ namespace GameJam
 			{
 				GameObject.Destroy(_state.Leader.gameObject);
 			}
+
 			foreach (var unit in _state.Units)
 			{
-				if (unit != null)
-				{
-					GameObject.Destroy(unit.gameObject);
-				}
+				GameObject.Destroy(unit.gameObject);
 			}
 			foreach (var projectile in _state.Projectiles)
 			{
@@ -76,51 +137,6 @@ namespace GameJam
 			_controls.Gameplay.Cancel.performed -= OnCancelReleased;
 
 			_startedTimestamp = 0f;
-		}
-
-		public override async void Tick()
-		{
-			base.Tick();
-
-			if (_startedTimestamp == 0f)
-			{
-				return;
-			}
-
-			foreach (var spawner in GameObject.FindObjectsOfType<UnitSpawner>())
-			{
-				if (Time.time >= _startedTimestamp + spawner.Delay)
-				{
-					_state.Units.Add(await SpawnUnit(spawner.UnitPrefab, _game, spawner));
-					GameObject.Destroy(spawner.gameObject);
-				}
-			}
-
-			if (_state.Leader == null)
-			{
-				_machine.Fire(GameStateMachine.Triggers.Defeat);
-			}
-			else
-			{
-				_state.Leader.StateMachine.Tick();
-			}
-
-			foreach (var entity in _state.Units)
-			{
-				entity.StateMachine?.Tick();
-			}
-
-			if (IsDevBuild())
-			{
-				if (Keyboard.current.f1Key.wasPressedThisFrame)
-				{
-					_machine.Fire(GameStateMachine.Triggers.Victory);
-				}
-				if (Keyboard.current.f2Key.wasPressedThisFrame)
-				{
-					_machine.Fire(GameStateMachine.Triggers.Defeat);
-				}
-			}
 		}
 
 		private void OnConfirmPressed(InputAction.CallbackContext obj) { }

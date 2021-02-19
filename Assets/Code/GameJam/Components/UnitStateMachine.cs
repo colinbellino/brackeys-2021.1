@@ -9,7 +9,7 @@ namespace GameJam
 {
 	public class UnitStateMachine
 	{
-		public enum States { Inactive, IdleShooter, PlayerControlState, Destroy }
+		public enum States { Inactive, PlayerControl, MoveInPosition, IdleShooter, Roamer, Destroy }
 		public enum Triggers { Done, Destroyed, ControlledByPlayer }
 
 		private readonly Dictionary<States, IState> _states;
@@ -25,21 +25,30 @@ namespace GameJam
 			_states = new Dictionary<States, IState>
 			{
 				{ States.Inactive, new InactiveState(this, game, actor) },
-				{ States.PlayerControlState, new PlayerControlState(this, game, actor) },
+				{ States.PlayerControl, new PlayerControlState(this, game, actor) },
+				{ States.MoveInPosition, new MoveInPositionState(this, game, actor) },
 				{ States.IdleShooter, new IdleShooterState(this, game, actor) },
+				{ States.Roamer, new RoamerState(this, game, actor) },
 				{ States.Destroy, new DestroyState(this, game, actor) },
 			};
 
 			_machine = new StateMachine<States, Triggers>(States.Inactive);
 
 			_machine.Configure(States.Inactive)
-				.PermitDynamicIf(Triggers.Done, () => States.PlayerControlState, () => _actor.Brain == AI.None)
-				.PermitDynamicIf(Triggers.Done, () => States.IdleShooter, () => _actor.Brain == AI.IdleShooter);
+				.PermitDynamicIf(Triggers.Done, () => States.PlayerControl, () => _actor.Brain == Brain.Player)
+				.PermitDynamicIf(Triggers.Done, () => States.MoveInPosition, () => _actor.Brain != Brain.Player);
+
+			_machine.Configure(States.MoveInPosition)
+				.PermitDynamicIf(Triggers.Done, () => States.IdleShooter, () => _actor.Brain == Brain.IdleShooter)
+				.PermitDynamicIf(Triggers.Done, () => States.Roamer, () => _actor.Brain == Brain.Roamer);
+
+			_machine.Configure(States.Roamer)
+				.Permit(Triggers.Destroyed, States.Destroy);
 
 			_machine.Configure(States.IdleShooter)
 				.Permit(Triggers.Destroyed, States.Destroy);
 
-			_machine.Configure(States.PlayerControlState)
+			_machine.Configure(States.PlayerControl)
 				.Permit(Triggers.Destroyed, States.Destroy);
 
 			_machine.OnTransitioned(OnTransitioned);
@@ -104,10 +113,7 @@ namespace GameJam
 
 			public virtual UniTask Exit() { return default; }
 
-			public virtual void Tick()
-			{
-				SetDebugText(_actor, $"{GetType().Name}");
-			}
+			public virtual void Tick() { }
 		}
 
 		private class InactiveState : BaseEntityState
@@ -119,36 +125,6 @@ namespace GameJam
 				await base.Enter();
 
 				_machine.Fire(Triggers.Done);
-			}
-		}
-
-		private class IdleShooterState : BaseEntityState
-		{
-			private bool _activated;
-
-			public IdleShooterState(UnitStateMachine machine, Game game, EntityComponent actor) : base(machine, game, actor) { }
-
-			public override async UniTask Enter()
-			{
-				await base.Enter();
-
-				await MoveInPosition(_actor);
-				_actor.transform.up = _game.State.Leader.transform.position - _actor.transform.position;
-
-				_activated = true;
-			}
-
-			public override void Tick()
-			{
-				base.Tick();
-
-				if (_activated)
-				{
-					_actor.transform.Rotate(_actor.RotationPerTick * Time.deltaTime);
-
-					_actor.Rigidbody.velocity = Vector3.zero;
-					FireProjectile(_actor, _game.State, _game.ProjectileSpawner);
-				}
 			}
 		}
 
@@ -164,18 +140,86 @@ namespace GameJam
 				var moveInput = _game.Controls.Gameplay.Move.ReadValue<Vector2>();
 				var confirmInput = _game.Controls.Gameplay.Confirm.ReadValue<float>();
 
-				_actor.Rigidbody.velocity = Vector3.zero;
-				_actor.transform.position = Vector3.Lerp(
-					_actor.transform.position,
-					_actor.transform.position + new Vector3(moveInput.x, moveInput.y, 0f),
-					_actor.MoveSpeed * Time.deltaTime
-				);
+				var destination = _actor.transform.position + new Vector3(moveInput.x, moveInput.y, 0f);
+				destination.x = Mathf.Clamp(destination.x, Game.MoveBounds.min.x, Game.MoveBounds.max.x);
+				destination.y = Mathf.Clamp(destination.y, Game.MoveBounds.min.y, Game.MoveBounds.max.y);
+				_actor.transform.position = Vector3.Lerp(_actor.transform.position, destination, _actor.MoveSpeed * Time.deltaTime);
+
 				_actor.transform.up = mouseWorldPosition - _actor.transform.position;
 
 				if (confirmInput > 0f)
 				{
 					FireProjectile(_actor, _game.State, _game.ProjectileSpawner);
 				}
+			}
+		}
+
+		private class MoveInPositionState : BaseEntityState
+		{
+			public MoveInPositionState(UnitStateMachine machine, Game game, EntityComponent actor) : base(machine, game, actor) { }
+
+			public override async UniTask Enter()
+			{
+				await base.Enter();
+
+				await _actor.transform.DOMove(_actor.MoveDestination, 3f).SetEase(Ease.InSine);
+
+				_machine.Fire(Triggers.Done);
+			}
+		}
+
+		private class IdleShooterState : BaseEntityState
+		{
+			public IdleShooterState(UnitStateMachine machine, Game game, EntityComponent actor) : base(machine, game, actor) { }
+
+			public override void Tick()
+			{
+				base.Tick();
+
+				foreach (var shooter in _actor.Shooters)
+				{
+					shooter.transform.Rotate(_actor.RotationPerTick * Time.deltaTime);
+				}
+
+				FireProjectile(_actor, _game.State, _game.ProjectileSpawner);
+			}
+		}
+
+		private class RoamerState : BaseEntityState
+		{
+			private Vector3 _destination;
+
+			public RoamerState(UnitStateMachine machine, Game game, EntityComponent actor) : base(machine, game, actor) { }
+
+			public override async UniTask Enter()
+			{
+				await base.Enter();
+
+				_destination = _actor.transform.position;
+			}
+
+			public override void Tick()
+			{
+				base.Tick();
+
+				if (Vector3.Distance(_destination, _actor.transform.position) < .1f)
+				{
+					var destination = _actor.transform.position + new Vector3(Random.Range(-5f, 5f), Random.Range(-5f, 5f), 0f);
+					if (Game.MoveBounds.Contains(destination))
+					{
+						_destination = destination;
+					}
+				}
+
+				foreach (var shooter in _actor.Shooters)
+				{
+					var randomOffset = new Vector3(Random.Range(-5f, 5f), Random.Range(-5f, 5f));
+					shooter.transform.up = (_game.State.Leader.transform.position + randomOffset) - _actor.transform.position;
+				}
+
+				_actor.transform.position = Vector3.Lerp(_actor.transform.position, _destination, Time.deltaTime * _actor.MoveSpeed);
+
+				FireProjectile(_actor, _game.State, _game.ProjectileSpawner);
 			}
 		}
 

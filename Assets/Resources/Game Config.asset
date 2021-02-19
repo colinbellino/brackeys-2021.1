@@ -14,3 +14,31 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   LeaderPrefab: {fileID: 4641049481721966404, guid: 59f9ad7a458b4844e9ac659f97fe6cc4, type: 3}
   DefaultProjectilePrefab: {fileID: 2322674617563913610, guid: 7220f06d60796dd45b11a42858fd38a3, type: 3}
+  Waves:
+  - Spawns:
+    - Position: {x: 0, y: 2}
+      EntityPrefab: {fileID: 4246819502291371097, guid: d382ce520e6d21641b1264655066cf76, type: 3}
+  - Spawns:
+    - Position: {x: -16, y: 9}
+      EntityPrefab: {fileID: 4246819502291371097, guid: d382ce520e6d21641b1264655066cf76, type: 3}
+    - Position: {x: 16, y: 9}
+      EntityPrefab: {fileID: 4246819502291371097, guid: d382ce520e6d21641b1264655066cf76, type: 3}
+  - Spawns:
+    - Position: {x: -16, y: 9}
+      EntityPrefab: {fileID: 4246819502291371097, guid: 0e32ce7e953cc994a9b00cddd4ea9034, type: 3}
+    - Position: {x: 0, y: 9}
+      EntityPrefab: {fileID: 4246819502291371097, guid: 0e32ce7e953cc994a9b00cddd4ea9034, type: 3}
+    - Position: {x: 16, y: 9}
+      EntityPrefab: {fileID: 4246819502291371097, guid: 0e32ce7e953cc994a9b00cddd4ea9034, type: 3}
+  - Spawns:
+    - Position: {x: -8, y: 0}
+      EntityPrefab: {fileID: 4246819502291371097, guid: 581d5d8e77a86bf4184d95ce7bca49aa, type: 3}
+    - Position: {x: 8, y: 0}
+      EntityPrefab: {fileID: 4246819502291371097, guid: 581d5d8e77a86bf4184d95ce7bca49aa, type: 3}
+  - Spawns:
+    - Position: {x: -9, y: 0}
+      EntityPrefab: {fileID: 4246819502291371097, guid: d25d48f1b32a0074faf110eb329802d3, type: 3}
+    - Position: {x: 0, y: 0}
+      EntityPrefab: {fileID: 4246819502291371097, guid: d25d48f1b32a0074faf110eb329802d3, type: 3}
+    - Position: {x: 9, y: 0}
+      EntityPrefab: {fileID: 4246819502291371097, guid: d25d48f1b32a0074faf110eb329802d3, type: 3}
