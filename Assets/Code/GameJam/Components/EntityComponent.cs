@@ -22,8 +22,6 @@ namespace GameJam
 		[HideInInspector] public Vector3 MoveDestination;
 		[HideInInspector] public IEnumerable<ShooterComponent> Shooters;
 
-		public override string ToString() => name;
-
 		private void Awake()
 		{
 			Shooters = GetComponentsInChildren<ShooterComponent>();

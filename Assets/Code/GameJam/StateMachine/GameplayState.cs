@@ -17,8 +17,8 @@ namespace GameJam
 		{
 			await base.Enter();
 
-			_state.Units = new List<EntityComponent>();
-			_state.Projectiles = new List<ProjectileComponent>();
+			_state.Units.Clear();
+			_state.Projectiles.Clear();
 			_state.Waves = new Queue<Wave>(_config.Waves);
 
 			if (IsDevBuild())
@@ -41,16 +41,25 @@ namespace GameJam
 			_ui.ShowGameplay();
 
 			_controls.Gameplay.Enable();
-			_controls.Gameplay.ConfirmPress.performed += OnConfirmPressed;
-			_controls.Gameplay.Confirm.performed += OnConfirmReleased;
-			_controls.Gameplay.Cancel.performed += OnCancelReleased;
-
-			_startedTimestamp = Time.time;
+			_controls.Gameplay.Confirm.performed += OnConfirmPerformed;
+			_controls.Gameplay.Move.performed += OnConfirmPerformed;
 		}
 
 		public override async void Tick()
 		{
 			base.Tick();
+
+			if (IsDevBuild())
+			{
+				if (Keyboard.current.f1Key.wasPressedThisFrame)
+				{
+					_machine.Fire(GameStateMachine.Triggers.Victory);
+				}
+				if (Keyboard.current.f2Key.wasPressedThisFrame)
+				{
+					_machine.Fire(GameStateMachine.Triggers.Defeat);
+				}
+			}
 
 			if (_startedTimestamp == 0f)
 			{
@@ -95,23 +104,13 @@ namespace GameJam
 				_ui.SetDebugText($"Player health: {_state.Leader.Health}");
 				_state.Leader.StateMachine.Tick();
 			}
-
-			if (IsDevBuild())
-			{
-				if (Keyboard.current.f1Key.wasPressedThisFrame)
-				{
-					_machine.Fire(GameStateMachine.Triggers.Victory);
-				}
-				if (Keyboard.current.f2Key.wasPressedThisFrame)
-				{
-					_machine.Fire(GameStateMachine.Triggers.Defeat);
-				}
-			}
 		}
 
 		public override async UniTask Exit()
 		{
 			await base.Exit();
+
+			await _ui.StartFadeToBlack();
 
 			await SceneManager.UnloadSceneAsync("Level");
 
@@ -132,18 +131,19 @@ namespace GameJam
 			_ui.HideGameplay();
 
 			_controls.Gameplay.Disable();
-			_controls.Gameplay.ConfirmPress.performed -= OnConfirmPressed;
-			_controls.Gameplay.Confirm.performed -= OnConfirmReleased;
-			_controls.Gameplay.Cancel.performed -= OnCancelReleased;
+			_controls.Gameplay.Confirm.performed -= OnConfirmPerformed;
+			_controls.Gameplay.Move.performed -= OnConfirmPerformed;
 
 			_startedTimestamp = 0f;
 		}
 
-		private void OnConfirmPressed(InputAction.CallbackContext obj) { }
+		private void OnConfirmPerformed(InputAction.CallbackContext obj)
+		{
+			_startedTimestamp = Time.time;
 
-		private void OnConfirmReleased(InputAction.CallbackContext obj) { }
-
-		private void OnCancelReleased(InputAction.CallbackContext obj) { }
+			_controls.Gameplay.Confirm.performed -= OnConfirmPerformed;
+			_controls.Gameplay.Move.performed -= OnConfirmPerformed;
+		}
 	}
 }
 
