@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: Enemy Projectile
   m_EditorClassIdentifier: 
   MoveSpeed: 5
-  CanBeDestroyed: 1
   Sprite: {fileID: 3286163911610860551, guid: 8387eabf456116643814e39befe03c07, type: 3}
   Color: {r: 1, g: 0.5254902, b: 0, a: 1}
   HitColliderRadius: 0.4
+  CanBeDestroyed: 1
+  CanDestroyOtherProjectiles: 1

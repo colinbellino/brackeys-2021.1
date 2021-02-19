@@ -19,6 +19,13 @@ namespace GameJam
 			_state.Units = new List<EntityComponent>();
 			_state.Projectiles = new List<ProjectileComponent>();
 
+			if (IsDevBuild())
+			{
+				if (SceneManager.sceneCount > 1)
+				{
+					await SceneManager.UnloadSceneAsync("Level");
+				}
+			}
 			await SceneManager.LoadSceneAsync("Level", LoadSceneMode.Additive);
 
 			{

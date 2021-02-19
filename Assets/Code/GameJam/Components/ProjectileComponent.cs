@@ -1,7 +1,5 @@
 ﻿using System;
 using UnityEngine;
-using UnityEngine.Serialization;
-using Random = UnityEngine.Random;
 
 namespace GameJam
 {
@@ -30,30 +28,37 @@ namespace GameJam
 			}
 		}
 
-		private void OnTriggerEnter2D(Collider2D other)
+		private void OnTriggerEnter2D(Collider2D collider)
 		{
-			var entity = other.GetComponentInParent<EntityComponent>();
-			if (entity != null && entity.Alliance != Alliance)
+			var otherEntity = collider.GetComponentInParent<EntityComponent>();
+			if (otherEntity != null && otherEntity.Alliance != Alliance)
 			{
-				DestroyProjectile(this);
-				HitEntity(entity, this);
+				HitEntity(otherEntity);
+
+				if (Data.CanBeDestroyed)
+				{
+					HitProjectile(this);
+				}
 				return;
 			}
 
-			var projectile = other.GetComponentInParent<ProjectileComponent>();
-			if (projectile != null && projectile.Data.CanBeDestroyed && projectile.Alliance != Alliance)
+			var otherProjectile = collider.GetComponentInParent<ProjectileComponent>();
+			if (otherProjectile != null && otherProjectile.Alliance != Alliance)
 			{
-				DestroyProjectile(projectile);
+				if (Data.CanDestroyOtherProjectiles && otherProjectile.Data.CanBeDestroyed)
+				{
+					HitProjectile(otherProjectile);
+				}
 
 				// var shouldDestroySelf = Random.Range(0, 100) > 75;
-				if (Data.CanBeDestroyed)
+				if (otherProjectile.Data.CanDestroyOtherProjectiles && Data.CanBeDestroyed)
 				{
-					DestroyProjectile(this);
+					HitProjectile(this);
 				}
 			}
 		}
 
-		public static void HitEntity(EntityComponent entity, ProjectileComponent projectile)
+		public static void HitEntity(EntityComponent entity)
 		{
 			entity.Health -= 1;
 
@@ -63,7 +68,7 @@ namespace GameJam
 			}
 		}
 
-		public static void DestroyProjectile(ProjectileComponent component)
+		public static void HitProjectile(ProjectileComponent component)
 		{
 			component.Destroyed?.Invoke();
 		}
