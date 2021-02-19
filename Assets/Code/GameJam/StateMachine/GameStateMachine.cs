@@ -12,6 +12,7 @@ namespace GameJam
 			Gameplay,
 			Victory,
 			Defeat,
+			Quit,
 		}
 		public enum Triggers
 		{
@@ -36,6 +37,7 @@ namespace GameJam
 				{ States.Gameplay, new GameplayState(this, game) },
 				{ States.Victory, new VictoryState(this, game) },
 				{ States.Defeat, new DefeatState(this, game) },
+				{ States.Quit, new QuitState(this, game) },
 			};
 
 			_machine = new StateMachine<States, Triggers>(States.Bootstrap);
@@ -49,10 +51,12 @@ namespace GameJam
 				.Permit(Triggers.Defeat, States.Defeat);
 
 			_machine.Configure(States.Victory)
-				.Permit(Triggers.Retry, States.Gameplay);
+				.Permit(Triggers.Retry, States.Gameplay)
+				.Permit(Triggers.Quit, States.Quit);
 
 			_machine.Configure(States.Defeat)
-				.Permit(Triggers.Retry, States.Gameplay);
+				.Permit(Triggers.Retry, States.Gameplay)
+				.Permit(Triggers.Quit, States.Quit);
 
 			_currentState = _states[_machine.State];
 		}
