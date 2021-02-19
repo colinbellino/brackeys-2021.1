@@ -21,8 +21,7 @@ namespace GameJam
 				Data.MoveSpeed * Time.deltaTime
 			);
 
-			var bounds = new Bounds(Vector3.zero, new Vector3(44f, 30f, 1f));
-			if (bounds.Contains(transform.position) == false)
+			if (Game.Bounds.Contains(transform.position) == false)
 			{
 				Destroyed?.Invoke();
 			}

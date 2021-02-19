@@ -8,14 +8,16 @@ namespace GameJam
 	public class ProjectileSpawner
 	{
 		private List<ProjectileComponent> _projectiles;
+		private GameObject _parent;
 
 		public void CreatePool(int count, ProjectileComponent prefab)
 		{
 			_projectiles = new List<ProjectileComponent>();
+			_parent = new GameObject("Projectiles");
 
 			for (var i = 0; i < count; i++)
 			{
-				var projectile = GameObject.Instantiate(prefab);
+				var projectile = GameObject.Instantiate(prefab, _parent.transform);
 				Disable(projectile);
 				_projectiles.Add(projectile);
 			}
@@ -49,7 +51,7 @@ namespace GameJam
 
 		private static void Enable(ProjectileComponent projectile, EntityComponent entity, ShooterComponent shooter)
 		{
-			projectile.transform.position = shooter.transform.position;
+			projectile.transform.position = shooter.Origin.position;
 			projectile.transform.rotation = shooter.transform.rotation;
 			projectile.Alliance = entity.Alliance;
 			projectile.Data = shooter.Projectile;

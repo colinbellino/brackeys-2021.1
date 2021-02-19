@@ -45,30 +45,9 @@ namespace GameJam
 		public void ShowDefeat() { _defeatRoot.SetActive(true); }
 		public void HideDefeat() { _defeatRoot.SetActive(false); }
 
-		public void SetSelectedUnits(List<EntityComponent> units)
+		public void SetDebugText(string value)
 		{
-			_debugText.text = "Selected characters:\n";
-			foreach (var unit in units)
-			{
-				_debugText.text += $"- {unit.name}\n";
-			}
-		}
-
-		public void SetSelectionRectangle(Vector3 start, Vector3 end)
-		{
-			var (origin, size) = GetSelectionBox(start, end);
-			_selectionRectangle.size = size;
-			_selectionRectangle.transform.position = origin;
-		}
-
-		public void ClearSelectionRectangle()
-		{
-			_selectionRectangle.size = Vector2.zero;
-		}
-
-		public void MoveCursor(Vector3 position)
-		{
-			_cursor.position = position;
+			_debugText.text = value;
 		}
 	}
 }
