@@ -316,6 +316,7 @@ MonoBehaviour:
   RotationPerTick: {x: 0, y: 0, z: 15}
   Parts: []
   Health: 1
+  RotationOffset: 0
   CanFireTimestamp: 0
   MoveDestination: {x: 0, y: 0, z: 0}
 --- !u!50 &305933623984123124
