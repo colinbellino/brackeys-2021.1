@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace GameJam
 {
@@ -103,6 +104,7 @@ namespace GameJam
 
         public static async UniTask<List<string>> LoadHelpers()
         {
+	        await UniTask.NextFrame();
 	        return Game.PlaceholderNames;
         }
 	}

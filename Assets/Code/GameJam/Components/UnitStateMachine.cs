@@ -276,6 +276,14 @@ namespace GameJam
 			{
 				await base.Enter();
 
+				if (_actor == _game.State.Player)
+				{
+					foreach (var helper in _game.State.Helpers)
+					{
+						GameObject.Destroy(helper.gameObject);
+					}
+				}
+
 				GameObject.Destroy(_actor.gameObject);
 			}
 		}
