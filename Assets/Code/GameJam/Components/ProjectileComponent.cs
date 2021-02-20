@@ -61,6 +61,15 @@ namespace GameJam
 		{
 			entity.Health -= 1;
 
+			if (entity.Parts.Length > 0)
+			{
+				for (var partIndex = 0; partIndex < entity.Parts.Length; partIndex++)
+				{
+					var part = entity.Parts[partIndex];
+					part.gameObject.SetActive(entity.Health > partIndex);
+				}
+			}
+
 			if (entity.Health <= 0)
 			{
 				entity.StateMachine.Fire(UnitStateMachine.Triggers.Destroyed);
