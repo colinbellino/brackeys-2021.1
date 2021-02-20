@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using static GameJam.Utils;
+using Object = UnityEngine.Object;
 
 namespace GameJam
 {
@@ -55,8 +56,11 @@ namespace GameJam
 			projectile.transform.rotation = shooter.transform.rotation;
 			projectile.Alliance = entity.Alliance;
 			projectile.Data = shooter.Projectile;
+			projectile.SpriteRenderer.material = Object.Instantiate(shooter.Projectile.Material);
+			projectile.SpriteRenderer.material.SetColor("_Color", shooter.Projectile.Color);
+			projectile.SpriteRenderer.material.SetColor("_EmissionColor", shooter.Projectile.Color);
 			projectile.SpriteRenderer.sprite = shooter.Projectile.Sprite;
-			projectile.SpriteRenderer.color = shooter.Projectile.Color;
+			// projectile.SpriteRenderer.color = shooter.Projectile.Color;
 			projectile.HitColliderRadius.radius = shooter.Projectile.HitColliderRadius;
 			projectile.gameObject.SetActive(true);
 		}

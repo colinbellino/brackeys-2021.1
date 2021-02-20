@@ -47,6 +47,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SpriteRenderer: {fileID: 1098369176765757369}
+  Light: {fileID: 0}
   HitColliderRadius: {fileID: 301398324204585726}
   Alliance: 0
   Data: {fileID: 0}
@@ -121,7 +122,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: c127ed7a34fbb8441a313e75d30759f5, type: 2}
+  - {fileID: 2100000, guid: 764fbac6e0c294041b941358160f167a, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

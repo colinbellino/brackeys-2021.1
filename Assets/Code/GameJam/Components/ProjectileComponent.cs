@@ -6,6 +6,7 @@ namespace GameJam
 	public class ProjectileComponent : MonoBehaviour
 	{
 		[SerializeField] public SpriteRenderer SpriteRenderer;
+		[SerializeField] public Light Light;
 		[SerializeField] public CircleCollider2D HitColliderRadius;
 
 		[HideInInspector] public Alliances Alliance;
@@ -46,7 +47,6 @@ namespace GameJam
 					HitProjectile(otherProjectile);
 				}
 
-				// var shouldDestroySelf = Random.Range(0, 100) > 75;
 				if (otherProjectile.Data.CanDestroyOtherProjectiles && Data.CanBeDestroyed)
 				{
 					HitProjectile(this);

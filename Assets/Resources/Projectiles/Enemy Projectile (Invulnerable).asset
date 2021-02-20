@@ -14,7 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MoveSpeed: 5
   Sprite: {fileID: 3286163911610860551, guid: 8387eabf456116643814e39befe03c07, type: 3}
-  Color: {r: 0.7490196, g: 0, b: 0.015686275, a: 1}
+  Material: {fileID: 2100000, guid: 764fbac6e0c294041b941358160f167a, type: 2}
+  Color: {r: 1.6055588, g: 0, b: 0, a: 1}
   HitColliderRadius: 0.4
   CanBeDestroyed: 0
   CanDestroyOtherProjectiles: 0
