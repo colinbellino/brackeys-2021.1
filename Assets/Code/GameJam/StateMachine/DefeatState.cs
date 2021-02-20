@@ -14,13 +14,14 @@ namespace GameJam
 		{
 			await base.Enter();
 
-			_state.DeathCounter += 1;
-
 			_helpers = await Utils.LoadHelpers();
 
-			_ui.ShowGiveUp();
+			_ui.ShowGiveUp(_state.DeathCounter);
 			_ui.GiveUpYesButton.onClick.AddListener(GiveUp);
 			_ui.GiveUpNoButton.onClick.AddListener(Continue);
+
+			_state.DeathCounter += 1;
+			_ui.SetCounter(_state.DeathCounter);
 		}
 
 		public override async UniTask Exit()
