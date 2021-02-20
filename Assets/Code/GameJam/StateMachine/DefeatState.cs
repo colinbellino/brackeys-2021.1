@@ -55,7 +55,7 @@ namespace GameJam
 		private async void RestartWithHelp()
 		{
 			Debug.Log("Accepted help.");
-			_state.Helpers = _helpers;
+			_state.HelpersName = _helpers;
 			_ui.HideReceiveHelp();
 
 			await _ui.EndFadeToBlack();

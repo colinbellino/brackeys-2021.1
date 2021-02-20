@@ -14,7 +14,7 @@ namespace GameJam
 			// Game.Instance.AudioPlayer.SetMusicVolume(Game.Instance.Config.MusicVolume);
 			// Game.Instance.AudioPlayer.SetSoundVolume(Game.Instance.Config.SoundVolume);
 
-			_projectileSpawner.CreatePool(200, _config.DefaultProjectilePrefab);
+			_projectileSpawner.CreatePool(1000, _config.DefaultProjectilePrefab);
 
 			Time.timeScale = 1f;
 

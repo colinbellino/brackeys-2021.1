@@ -9,8 +9,8 @@ namespace GameJam
 {
 	public class UnitStateMachine
 	{
-		public enum States { Inactive, PlayerControl, MoveInPosition, IdleShooter, Roamer, Destroy }
-		public enum Triggers { Done, Destroyed, ControlledByPlayer }
+		public enum States { Inactive, PlayerControl, Helper, MoveInPosition, IdleShooter, Roamer, Destroy }
+		public enum Triggers { Done, Destroyed }
 
 		private readonly Dictionary<States, IState> _states;
 		private readonly StateMachine<States, Triggers> _machine;
@@ -26,8 +26,9 @@ namespace GameJam
 			{
 				{ States.Inactive, new InactiveState(this, game, actor) },
 				{ States.PlayerControl, new PlayerControlState(this, game, actor) },
+				{ States.Helper, new HelperState(this, game, actor) },
 				{ States.MoveInPosition, new MoveInPositionState(this, game, actor) },
-				{ States.IdleShooter, new IdleShooterState(this, game, actor) },
+				{ States.IdleShooter, new ShooterState(this, game, actor) },
 				{ States.Roamer, new RoamerState(this, game, actor) },
 				{ States.Destroy, new DestroyState(this, game, actor) },
 			};
@@ -36,11 +37,17 @@ namespace GameJam
 
 			_machine.Configure(States.Inactive)
 				.PermitDynamicIf(Triggers.Done, () => States.PlayerControl, () => _actor.Brain == Brain.Player)
-				.PermitDynamicIf(Triggers.Done, () => States.MoveInPosition, () => _actor.Brain != Brain.Player);
+				.PermitDynamicIf(Triggers.Done, () => States.Helper, () => _actor.Brain == Brain.Helper)
+				.PermitDynamicIf(Triggers.Done, () => States.MoveInPosition, () => _actor.Brain == Brain.Shooter)
+				.PermitDynamicIf(Triggers.Done, () => States.MoveInPosition, () => _actor.Brain == Brain.Roamer);
 
 			_machine.Configure(States.MoveInPosition)
-				.PermitDynamicIf(Triggers.Done, () => States.IdleShooter, () => _actor.Brain == Brain.IdleShooter)
-				.PermitDynamicIf(Triggers.Done, () => States.Roamer, () => _actor.Brain == Brain.Roamer);
+				.PermitDynamicIf(Triggers.Done, () => States.IdleShooter, () => _actor.Brain == Brain.Shooter)
+				.PermitDynamicIf(Triggers.Done, () => States.Roamer, () => _actor.Brain == Brain.Roamer)
+				.Permit(Triggers.Destroyed, States.Destroy);
+
+			_machine.Configure(States.Helper)
+				.Permit(Triggers.Destroyed, States.Destroy);
 
 			_machine.Configure(States.Roamer)
 				.Permit(Triggers.Destroyed, States.Destroy);
@@ -68,7 +75,7 @@ namespace GameJam
 			}
 			else
 			{
-				Debug.LogWarning("Invalid transition " + _currentState + " -> " + trigger);
+				Debug.LogWarning("Invalid transition " + _currentState.GetType().Name + " -> " + trigger);
 			}
 		}
 
@@ -150,6 +157,11 @@ namespace GameJam
 				if (confirmInput > 0f)
 				{
 					FireProjectile(_actor, _game.State, _game.ProjectileSpawner);
+
+					foreach (var helper in _game.State.Helpers)
+					{
+						FireProjectile(helper, _game.State, _game.ProjectileSpawner);
+					}
 				}
 			}
 		}
@@ -168,9 +180,39 @@ namespace GameJam
 			}
 		}
 
-		private class IdleShooterState : BaseEntityState
+		private class HelperState : BaseEntityState
 		{
-			public IdleShooterState(UnitStateMachine machine, Game game, EntityComponent actor) : base(machine, game, actor) { }
+			private float _angle;
+
+			public HelperState(UnitStateMachine machine, Game game, EntityComponent actor) : base(machine, game, actor) { }
+
+			public override async UniTask Enter()
+			{
+				await base.Enter();
+
+				_angle = _actor.RotationOffset * Mathf.PI / 180f;
+			}
+
+			public override void Tick()
+			{
+				base.Tick();
+
+				_angle += _actor.MoveSpeed * Time.deltaTime;
+
+				var radius = Game.HELPERS_RADIUS;
+				var offset = new Vector3(
+					Mathf.Cos(_angle) * radius,
+					Mathf.Sin(_angle) * radius,
+					0f
+				);
+				 _actor.transform.position = _game.State.Player.transform.position + offset;
+				 _actor.transform.rotation = _game.State.Player.transform.rotation;
+			}
+		}
+
+		private class ShooterState : BaseEntityState
+		{
+			public ShooterState(UnitStateMachine machine, Game game, EntityComponent actor) : base(machine, game, actor) { }
 
 			public override void Tick()
 			{
@@ -211,10 +253,13 @@ namespace GameJam
 					}
 				}
 
-				foreach (var shooter in _actor.Shooters)
+				if (_game.State.Player != null)
 				{
-					var randomOffset = new Vector3(Random.Range(-5f, 5f), Random.Range(-5f, 5f));
-					shooter.transform.up = (_game.State.Leader.transform.position + randomOffset) - _actor.transform.position;
+					foreach (var shooter in _actor.Shooters)
+					{
+						var randomOffset = new Vector3(Random.Range(-5f, 5f), Random.Range(-5f, 5f));
+						shooter.transform.up = (_game.State.Player.transform.position + randomOffset) - _actor.transform.position;
+					}
 				}
 
 				_actor.transform.position = Vector3.Lerp(_actor.transform.position, _destination, Time.deltaTime * _actor.MoveSpeed);

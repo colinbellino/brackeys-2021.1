@@ -8,7 +8,8 @@ namespace GameJam
 	[CreateAssetMenu(menuName = "Game Jam/Game Config")]
 	public class GameConfig : ScriptableObject
 	{
-		public EntityComponent LeaderPrefab;
+		[FormerlySerializedAs("LeaderPrefab")] public EntityComponent PlayerPrefab;
+		public EntityComponent HelperPrefab;
 		public ProjectileComponent DefaultProjectilePrefab;
 		public List<Wave> Waves;
 

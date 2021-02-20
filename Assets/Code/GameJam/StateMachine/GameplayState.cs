@@ -16,13 +16,22 @@ namespace GameJam
 		{
 			await base.Enter();
 
-			_state.Units.Clear();
+			_state.Enemies.Clear();
 			_state.Projectiles.Clear();
 			_state.Waves = new Queue<Wave>(_config.Waves);
+			_state.Helpers = new List<EntityComponent>();
 
+			_state.Player = await SpawnPlayer(_config.PlayerPrefab, _game, Vector3.zero);
+			for (var helperIndex = 0; helperIndex < _state.HelpersName.Count; helperIndex++)
 			{
-				var spawner = GameObject.FindObjectOfType<LeaderSpawner>();
-				_state.Leader = await SpawnLeader(_config.LeaderPrefab, _game, spawner);
+				if (helperIndex + 1 > Game.HELPERS_MAX_COUNT)
+				{
+					break;
+				}
+
+				var helperName = _state.HelpersName[helperIndex];
+				var position = new Vector3(0f, Game.Bounds.min.y, 0f);
+				_state.Helpers.Add(await SpawnHelper(_config.HelperPrefab, helperIndex * 360f / Game.HELPERS_MAX_COUNT, helperName, _game, position));
 			}
 
 			_ui.ShowGameplay();
@@ -47,6 +56,11 @@ namespace GameJam
 				{
 					_machine.Fire(GameStateMachine.Triggers.Defeat);
 				}
+				if (Keyboard.current.f3Key.wasPressedThisFrame)
+				{
+					_state.DeathCounter = 99;
+					_machine.Fire(GameStateMachine.Triggers.Defeat);
+				}
 			}
 
 			if (_startedTimestamp == 0f)
@@ -54,19 +68,31 @@ namespace GameJam
 				return;
 			}
 
-			for (var entityIndex = _state.Units.Count - 1; entityIndex >= 0; entityIndex--)
+			for (var entityIndex = _state.Enemies.Count - 1; entityIndex >= 0; entityIndex--)
 			{
-				var entity = _state.Units[entityIndex];
+				var entity = _state.Enemies[entityIndex];
 				if (entity == null)
 				{
-					_state.Units.RemoveAt(entityIndex);
+					_state.Enemies.RemoveAt(entityIndex);
 					continue;
 				}
 
 				entity.StateMachine.Tick();
 			}
 
-			if (_state.Units.Count == 0)
+			for (var entityIndex = _state.Helpers.Count - 1; entityIndex >= 0; entityIndex--)
+			{
+				var entity = _state.Helpers[entityIndex];
+				if (entity == null)
+				{
+					_state.Helpers.RemoveAt(entityIndex);
+					continue;
+				}
+
+				entity.StateMachine.Tick();
+			}
+
+			if (_state.Enemies.Count == 0)
 			{
 				if (_state.Waves.Count == 0)
 				{
@@ -78,19 +104,19 @@ namespace GameJam
 
 				foreach (var spawn in wave.Spawns)
 				{
-					var unit = await SpawnUnit(spawn.EntityPrefab, _game, spawn.Position);
-					_state.Units.Add(unit);
+					var enemy = await SpawnEnemy(spawn.EntityPrefab, _game, spawn.Position);
+					_state.Enemies.Add(enemy);
 				}
 			}
 
-			if (_state.Leader == null)
+			if (_state.Player == null)
 			{
 				_machine.Fire(GameStateMachine.Triggers.Defeat);
 			}
 			else
 			{
-				_ui.SetDebugText($"Player health: {_state.Leader.Health}");
-				_state.Leader.StateMachine.Tick();
+				_ui.SetDebugText($"Player health: {_state.Player.Health}");
+				_state.Player.StateMachine.Tick();
 			}
 		}
 
@@ -100,14 +126,18 @@ namespace GameJam
 
 			await _ui.StartFadeToBlack();
 
-			if (_state.Leader != null)
+			if (_state.Player != null)
 			{
-				GameObject.Destroy(_state.Leader.gameObject);
+				GameObject.Destroy(_state.Player.gameObject);
 			}
 
-			foreach (var unit in _state.Units)
+			foreach (var enemy in _state.Enemies)
 			{
-				GameObject.Destroy(unit.gameObject);
+				GameObject.Destroy(enemy.gameObject);
+			}
+			foreach (var helper in _state.Helpers)
+			{
+				GameObject.Destroy(helper.gameObject);
 			}
 			foreach (var projectile in _state.Projectiles)
 			{

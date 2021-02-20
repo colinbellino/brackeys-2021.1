@@ -6,22 +6,8 @@ namespace GameJam
 {
 	public class GameStateMachine
 	{
-		public enum States
-		{
-			Bootstrap,
-			Gameplay,
-			Victory,
-			Defeat,
-			Quit,
-		}
-		public enum Triggers
-		{
-			Done,
-			Victory,
-			Defeat,
-			Retry,
-			Quit,
-		}
+		public enum States { Bootstrap, Gameplay, Victory, Defeat, Quit }
+		public enum Triggers { Done, Victory, Defeat, Retry, Quit }
 
 		private readonly Dictionary<States, IState> _states;
 		private readonly StateMachine<States, Triggers> _machine;
