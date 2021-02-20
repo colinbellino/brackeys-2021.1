@@ -4,7 +4,7 @@ using UnityEngine;
 namespace GameJam
 {
 	public enum Alliances { Foe, Ally }
-	public enum Brain { Player, IdleShooter, Roamer }
+	public enum Brain { Player, Helper, Shooter, Roamer }
 
 	[SelectionBase]
 	public class EntityComponent : MonoBehaviour
@@ -17,7 +17,8 @@ namespace GameJam
 		[SerializeField] public Vector3 RotationPerTick;
 		[SerializeField] public SpriteRenderer[] Parts;
 
-		[HideInInspector] public int Health = 1	;
+		[HideInInspector] public int Health = 1;
+		[HideInInspector] public float RotationOffset;
 		[HideInInspector] public float CanFireTimestamp;
 		[HideInInspector] public UnitStateMachine StateMachine;
 		[HideInInspector] public Vector3 MoveDestination;

@@ -18,7 +18,7 @@ namespace GameJam
 			return manager.Game;
 		}
 
-        public static async UniTask<EntityComponent> SpawnUnit(EntityComponent prefab, Game game, Vector3 position)
+        public static async UniTask<EntityComponent> SpawnEnemy(EntityComponent prefab, Game game, Vector3 position)
         {
 	        var origin = position;
 	        origin.y = Game.Bounds.max.y;
@@ -30,11 +30,23 @@ namespace GameJam
 	        return entity;
         }
 
-        public static async UniTask<EntityComponent> SpawnLeader(EntityComponent prefab, Game game, LeaderSpawner spawner)
+        public static async UniTask<EntityComponent> SpawnPlayer(EntityComponent prefab, Game game, Vector3 position)
         {
-	        var entity = GameObject.Instantiate(prefab, spawner.transform.position, Quaternion.identity);
+	        var entity = GameObject.Instantiate(prefab, position, Quaternion.identity);
 	        entity.transform.name = "Leader";
 	        entity.Health = entity.StartingHealth;
+	        entity.StateMachine = new UnitStateMachine(false, game, entity);
+	        await entity.StateMachine.Start();
+	        return entity;
+        }
+
+        public static async UniTask<EntityComponent> SpawnHelper(EntityComponent prefab, float offset, string name, Game game, Vector3 position)
+        {
+	        var entity = GameObject.Instantiate(prefab, position, Quaternion.identity);
+	        entity.transform.name = $"Helper: {name}";
+	        entity.Health = 1;
+	        entity.MoveDestination = game.State.Player.transform.position;
+	        entity.RotationOffset = offset;
 	        entity.StateMachine = new UnitStateMachine(false, game, entity);
 	        await entity.StateMachine.Start();
 	        return entity;

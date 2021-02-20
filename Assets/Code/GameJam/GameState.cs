@@ -4,11 +4,12 @@ namespace GameJam
 {
 	public class GameState
 	{
-		public EntityComponent Leader;
-		public readonly List<EntityComponent> Units = new List<EntityComponent>();
+		public EntityComponent Player;
+		public readonly List<EntityComponent> Enemies = new List<EntityComponent>();
 		public readonly List<ProjectileComponent> Projectiles = new List<ProjectileComponent>();
 		public Queue<Wave> Waves;
-		public List<string> Helpers = new List<string>();
+		public List<string> HelpersName = new List<string>();
+		public List<EntityComponent> Helpers = new List<EntityComponent>();
 		public int DeathCounter;
 	}
 }

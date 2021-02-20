@@ -365,7 +365,7 @@ SpriteRenderer:
   m_SortingLayer: 1
   m_SortingOrder: 2
   m_Sprite: {fileID: 3286163911610860551, guid: 73fe64cacbd09b542ae305a3ebdace1a, type: 3}
-  m_Color: {r: 0.7490196, g: 0, b: 0.015686275, a: 1}
+  m_Color: {r: 0.028301895, g: 0.028301895, b: 0.028301895, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -387,7 +387,7 @@ GameObject:
   - component: {fileID: 4641049481721966404}
   - component: {fileID: 9131346481287055337}
   m_Layer: 0
-  m_Name: Leader
+  m_Name: Helper
   m_TagString: Untagged
   m_Icon: {fileID: 3936346786652291628, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
@@ -426,16 +426,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   FireRate: 0.1
-  MoveSpeed: 10
-  StartingHealth: 3
+  MoveSpeed: 5
+  StartingHealth: 1
   Alliance: 1
-  Brain: 0
+  Brain: 1
   RotationPerTick: {x: 0, y: 0, z: 0}
   Parts:
   - {fileID: 617558245227302624}
   - {fileID: 8737169888719058384}
   - {fileID: 8884424188568762234}
   Health: 1
+  RotationOffset: 0
   CanFireTimestamp: 0
   MoveDestination: {x: 0, y: 0, z: 0}
 --- !u!50 &9131346481287055337

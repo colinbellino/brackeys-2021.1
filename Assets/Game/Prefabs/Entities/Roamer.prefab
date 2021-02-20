@@ -262,7 +262,7 @@ MonoBehaviour:
   MoveSpeed: 3
   StartingHealth: 1
   Alliance: 0
-  Brain: 2
+  Brain: 3
   RotationPerTick: {x: 0, y: 0, z: 10}
   Parts: []
   Health: 1

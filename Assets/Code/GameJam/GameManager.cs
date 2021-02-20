@@ -18,7 +18,7 @@ namespace GameJam
             Game.State = new GameState();
             Game.ProjectileSpawner = new ProjectileSpawner();
 
-	        _machine = new GameStateMachine(true, Game);
+	        _machine = new GameStateMachine(false, Game);
         }
 
         private void Start()
