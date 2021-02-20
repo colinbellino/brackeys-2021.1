@@ -9,6 +9,7 @@ namespace GameJam
 	public class GameplayState : BaseGameState
 	{
 		private double _spawnHelperTimestamp;
+		private bool _transitionDone;
 
 		public GameplayState(GameStateMachine machine, Game game) : base(machine, game) { }
 
@@ -20,7 +21,6 @@ namespace GameJam
 			_state.Projectiles.Clear();
 			_state.Waves = new Queue<Wave>(_config.Waves);
 			_state.Helpers = new EntityComponent[5];
-			_state.Player = await SpawnPlayer(_config.PlayerPrefab, _game, Vector3.zero);
 
 			if (IsDevBuild())
 			{
@@ -36,6 +36,8 @@ namespace GameJam
 			}
 
 			_spawnHelperTimestamp = Time.time + Game.HELPERS_SPAWN_INTERVAL;
+			_state.Player = await SpawnPlayer(_config.PlayerPrefab, _game, Vector3.zero);
+			_transitionDone = true;
 
 			_controls.Gameplay.Enable();
 		}
@@ -59,6 +61,11 @@ namespace GameJam
 					_state.DeathCounter = 99;
 					_machine.Fire(GameStateMachine.Triggers.Defeat);
 				}
+			}
+
+			if (_transitionDone == false)
+			{
+				return;
 			}
 
 			for (var entityIndex = _state.Helpers.Length - 1; entityIndex >= 0; entityIndex--)
@@ -135,6 +142,8 @@ namespace GameJam
 		public override async UniTask Exit()
 		{
 			await base.Exit();
+
+			_transitionDone = false;
 
 			await _ui.StartFadeToBlack();
 

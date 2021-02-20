@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 79c1406057bc9ef439bf7cd834307b6a
+guid: 4a24790896be59f459e31e901d0016e1
 ScriptedImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -8,7 +8,7 @@ ScriptedImporter:
   assetBundleName: 
   assetBundleVariant: 
   script: {fileID: 11500000, guid: a57477913897c46af95d590f580878bd, type: 3}
-  svgType: 0
+  svgType: 1
   texturedSpriteMeshType: 0
   svgPixelsPerUnit: 100
   gradientResolution: 64
@@ -35,7 +35,7 @@ ScriptedImporter:
   filterMode: 1
   sampleCount: 4
   preserveSVGImageAspect: 0
-  useSVGPixelsPerUnit: 1
+  useSVGPixelsPerUnit: 0
   spriteData:
     TessellationDetail: 0
     SpriteRect:
@@ -50,6 +50,6 @@ ScriptedImporter:
         y: 0
         width: 0
         height: 0
-      spriteID: 287fd22a7696b2240b8603eb1e311b74
+      spriteID: 57e6a7f9dffe2a84684ff59909316d73
       internalID: 0
     PhysicsOutlines: []
