@@ -151,8 +151,9 @@ namespace GameJam
 				destination.x = Mathf.Clamp(destination.x, Game.MoveBounds.min.x, Game.MoveBounds.max.x);
 				destination.y = Mathf.Clamp(destination.y, Game.MoveBounds.min.y, Game.MoveBounds.max.y);
 				_actor.transform.position = Vector3.Lerp(_actor.transform.position, destination, _actor.MoveSpeed * Time.deltaTime);
-
 				_actor.transform.up = mouseWorldPosition - _actor.transform.position;
+
+				_actor.HelperAngle += _actor.RotateSpeed * Time.deltaTime;
 
 				if (confirmInput > 0f)
 				{
@@ -182,7 +183,8 @@ namespace GameJam
 
 		private class HelperState : BaseEntityState
 		{
-			private float _angle;
+			private bool _circlingPlayer;
+			private double _startCirclingPlayerTimestamp;
 
 			public HelperState(UnitStateMachine machine, Game game, EntityComponent actor) : base(machine, game, actor) { }
 
@@ -190,22 +192,36 @@ namespace GameJam
 			{
 				await base.Enter();
 
-				_angle = _actor.RotationOffset * Mathf.PI / 180f;
+				_startCirclingPlayerTimestamp = Time.time + 2f;
 			}
 
 			public override void Tick()
 			{
 				base.Tick();
 
-				_angle += _actor.MoveSpeed * Time.deltaTime;
-
 				var radius = Game.HELPERS_RADIUS;
+				var angle = _game.State.Player.HelperAngle + _actor.HelperIndex * Mathf.PI * 2 / Game.HELPERS_MAX_COUNT;
 				var offset = new Vector3(
-					Mathf.Cos(_angle) * radius,
-					Mathf.Sin(_angle) * radius,
+					Mathf.Cos(angle) * radius,
+					Mathf.Sin(angle) * radius,
 					0f
 				);
-				 _actor.transform.position = _game.State.Player.transform.position + offset;
+				var destination = _game.State.Player.transform.position + offset;
+
+				 if (_circlingPlayer)
+				 {
+					 _actor.transform.position = destination;
+				 }
+				 else
+				 {
+					 _actor.transform.position = Vector3.Lerp(_actor.transform.position, destination, _actor.MoveSpeed * Time.deltaTime);
+
+					 if (Vector3.Distance(_actor.transform.position, destination) < 0.2f || Time.time > _startCirclingPlayerTimestamp)
+					 {
+						 _circlingPlayer = true;
+					 }
+				 }
+
 				 _actor.transform.rotation = _game.State.Player.transform.rotation;
 			}
 		}

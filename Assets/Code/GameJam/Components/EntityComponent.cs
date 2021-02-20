@@ -11,6 +11,7 @@ namespace GameJam
 	{
 		[SerializeField] public float FireRate = 0.1f;
 		[SerializeField] public float MoveSpeed = 10f;
+		[SerializeField] public float RotateSpeed = 5f;
 		[SerializeField] public int StartingHealth = 3;
 		[SerializeField] public Alliances Alliance;
 		[SerializeField] public Brain Brain;
@@ -23,6 +24,8 @@ namespace GameJam
 		[HideInInspector] public UnitStateMachine StateMachine;
 		[HideInInspector] public Vector3 MoveDestination;
 		[HideInInspector] public IEnumerable<ShooterComponent> Shooters;
+		[HideInInspector] public int HelperIndex;
+		[HideInInspector] public float HelperAngle;
 
 		private void Awake()
 		{
