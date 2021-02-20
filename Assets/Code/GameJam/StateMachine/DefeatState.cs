@@ -54,12 +54,13 @@ namespace GameJam
 
 		private async void RestartWithHelp()
 		{
-			Debug.Log("Accepted help.");
-			_state.HelpersName = _helpers;
-			_state.HelpReceived = true;
 			_ui.HideReceiveHelp();
 
-			await _ui.EndFadeToBlack();
+			await _audioPlayer.StopMusic(1f);
+			// await _ui.EndFadeToBlack();
+
+			_state.HelpersName = _helpers;
+			_state.HelpReceived = true;
 
 			_machine.Fire(GameStateMachine.Triggers.Retry);
 		}

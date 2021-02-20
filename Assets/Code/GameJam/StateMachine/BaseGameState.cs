@@ -13,6 +13,7 @@ namespace GameJam
 		protected Camera _camera => _game.Camera;
 		protected GameControls _controls => _game.Controls;
 		protected GameState _state => _game.State;
+		protected AudioPlayer _audioPlayer => _game.AudioPlayer;
 		protected ProjectileSpawner _projectileSpawner => _game.ProjectileSpawner;
 
 		protected BaseGameState(GameStateMachine machine, Game game)

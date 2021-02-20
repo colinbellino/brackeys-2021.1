@@ -11,8 +11,8 @@ namespace GameJam
 		{
 			await base.Enter();
 
-			// Game.Instance.AudioPlayer.SetMusicVolume(Game.Instance.Config.MusicVolume);
-			// Game.Instance.AudioPlayer.SetSoundVolume(Game.Instance.Config.SoundVolume);
+			_audioPlayer.SetMusicVolume(_config.MusicVolume);
+			_audioPlayer.SetSoundVolume(_config.SoundVolume);
 
 			_projectileSpawner.CreatePool(1000, _config.DefaultProjectilePrefab);
 

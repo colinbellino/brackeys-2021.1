@@ -56,3 +56,13 @@ MonoBehaviour:
       EntityPrefab: {fileID: 4246819502291371097, guid: d25d48f1b32a0074faf110eb329802d3, type: 3}
     - Position: {x: 7, y: 0}
       EntityPrefab: {fileID: 4246819502291371097, guid: d25d48f1b32a0074faf110eb329802d3, type: 3}
+  AudioMixer: {fileID: 24100000, guid: c00711887b3714031932c58a1ac16396, type: 2}
+  MusicAudioMixerGroup: {fileID: -1804572004088458924, guid: c00711887b3714031932c58a1ac16396, type: 2}
+  SoundsAudioMixerGroup: {fileID: 3053297684183750015, guid: c00711887b3714031932c58a1ac16396, type: 2}
+  DefaultAudioSnapshot: {fileID: 24500006, guid: c00711887b3714031932c58a1ac16396, type: 2}
+  PauseAudioSnapshot: {fileID: 6893898828190700123, guid: c00711887b3714031932c58a1ac16396, type: 2}
+  MainMusic: {fileID: 8300000, guid: 3901573ea068d7e418fa631f32900a5c, type: 3}
+  HelpReceivedMusic: {fileID: 8300000, guid: f80df30193093cc45865957ade46d5c1, type: 3}
+  MenuConfirmClip: {fileID: 8300000, guid: c1f8ee177987e6044b654bb36ae992fd, type: 3}
+  MusicVolume: 0.8
+  SoundVolume: 1

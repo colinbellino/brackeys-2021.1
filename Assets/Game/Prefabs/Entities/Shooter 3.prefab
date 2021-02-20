@@ -701,6 +701,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   FireRate: 0.5
   MoveSpeed: 10
+  RotateSpeed: 5
   StartingHealth: 15
   Alliance: 0
   Brain: 2
@@ -710,6 +711,8 @@ MonoBehaviour:
   RotationOffset: 0
   CanFireTimestamp: 0
   MoveDestination: {x: 0, y: 0, z: 0}
+  HelperIndex: 0
+  HelperAngle: 0
 --- !u!50 &305933623984123124
 Rigidbody2D:
   serializedVersion: 4

@@ -137,7 +137,16 @@ namespace GameJam
 
 		private class PlayerControlState : BaseEntityState
 		{
+			private Vector3 _defaultMousePosition;
+
 			public PlayerControlState(UnitStateMachine machine, Game game, EntityComponent actor) : base(machine, game, actor) { }
+
+			public override async UniTask Enter()
+			{
+				await base.Enter();
+
+				_defaultMousePosition = GetMouseWorldPosition(_game.Controls, _game.Camera);
+			}
 
 			public override void Tick()
 			{
@@ -147,11 +156,18 @@ namespace GameJam
 				var moveInput = _game.Controls.Gameplay.Move.ReadValue<Vector2>();
 				var confirmInput = _game.Controls.Gameplay.Confirm.ReadValue<float>();
 
-				var destination = _actor.transform.position + new Vector3(moveInput.x, moveInput.y, 0f);
-				destination.x = Mathf.Clamp(destination.x, Game.MoveBounds.min.x, Game.MoveBounds.max.x);
-				destination.y = Mathf.Clamp(destination.y, Game.MoveBounds.min.y, Game.MoveBounds.max.y);
-				_actor.transform.position = Vector3.Lerp(_actor.transform.position, destination, _actor.MoveSpeed * Time.deltaTime);
-				_actor.transform.up = mouseWorldPosition - _actor.transform.position;
+				if (moveInput.magnitude > 0f)
+				{
+					var destination = _actor.transform.position + new Vector3(moveInput.x, moveInput.y, 0f);
+					destination.x = Mathf.Clamp(destination.x, Game.MoveBounds.min.x, Game.MoveBounds.max.x);
+					destination.y = Mathf.Clamp(destination.y, Game.MoveBounds.min.y, Game.MoveBounds.max.y);
+					_actor.transform.position = Vector3.Lerp(_actor.transform.position, destination, _actor.MoveSpeed * Time.deltaTime);
+				}
+
+				if (mouseWorldPosition != _defaultMousePosition)
+				{
+					_actor.transform.up = Vector3.Lerp(_actor.transform.up, mouseWorldPosition - _actor.transform.position, 25f * Time.deltaTime);
+				}
 
 				_actor.HelperAngle += _actor.RotateSpeed * Time.deltaTime;
 
@@ -296,7 +312,10 @@ namespace GameJam
 				{
 					foreach (var helper in _game.State.Helpers)
 					{
-						GameObject.Destroy(helper.gameObject);
+						if (helper != null)
+						{
+							GameObject.Destroy(helper.gameObject);
+						}
 					}
 				}
 

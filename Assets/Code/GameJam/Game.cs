@@ -11,6 +11,7 @@ namespace GameJam
 		public GameControls Controls;
 		public GameState State;
 		public ProjectileSpawner ProjectileSpawner;
+		public AudioPlayer AudioPlayer;
 
 		public const float HELPERS_SPAWN_INTERVAL = 1f;
 		public const float HELPERS_RADIUS = 1.5f;

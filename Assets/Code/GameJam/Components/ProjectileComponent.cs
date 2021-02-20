@@ -34,10 +34,7 @@ namespace GameJam
 			{
 				HitEntity(otherEntity);
 
-				if (Data.CanBeDestroyed)
-				{
-					HitProjectile(this);
-				}
+				HitProjectile(this);
 				return;
 			}
 
