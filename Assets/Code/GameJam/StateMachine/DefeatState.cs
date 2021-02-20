@@ -56,6 +56,7 @@ namespace GameJam
 		{
 			Debug.Log("Accepted help.");
 			_state.HelpersName = _helpers;
+			_state.HelpReceived = true;
 			_ui.HideReceiveHelp();
 
 			await _ui.EndFadeToBlack();

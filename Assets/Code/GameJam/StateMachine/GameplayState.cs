@@ -9,6 +9,7 @@ namespace GameJam
 	public class GameplayState : BaseGameState
 	{
 		private double _startedTimestamp;
+		private double _spawnHelperTimestamp;
 
 		public GameplayState(GameStateMachine machine, Game game) : base(machine, game) { }
 
@@ -19,20 +20,8 @@ namespace GameJam
 			_state.Enemies.Clear();
 			_state.Projectiles.Clear();
 			_state.Waves = new Queue<Wave>(_config.Waves);
-			_state.Helpers = new List<EntityComponent>();
-
+			_state.Helpers = new EntityComponent[5];
 			_state.Player = await SpawnPlayer(_config.PlayerPrefab, _game, Vector3.zero);
-			for (var helperIndex = 0; helperIndex < _state.HelpersName.Count; helperIndex++)
-			{
-				if (helperIndex + 1 > Game.HELPERS_MAX_COUNT)
-				{
-					break;
-				}
-
-				var helperName = _state.HelpersName[helperIndex];
-				var position = new Vector3(0f, Game.Bounds.min.y, 0f);
-				_state.Helpers.Add(await SpawnHelper(_config.HelperPrefab, helperIndex * 360f / Game.HELPERS_MAX_COUNT, helperName, _game, position));
-			}
 
 			_ui.ShowGameplay();
 			_ui.SetDebugText("");
@@ -80,16 +69,13 @@ namespace GameJam
 				entity.StateMachine.Tick();
 			}
 
-			for (var entityIndex = _state.Helpers.Count - 1; entityIndex >= 0; entityIndex--)
+			for (var entityIndex = _state.Helpers.Length - 1; entityIndex >= 0; entityIndex--)
 			{
 				var entity = _state.Helpers[entityIndex];
-				if (entity == null)
+				if (entity != null)
 				{
-					_state.Helpers.RemoveAt(entityIndex);
-					continue;
+					entity.StateMachine.Tick();
 				}
-
-				entity.StateMachine.Tick();
 			}
 
 			if (_state.Enemies.Count == 0)
@@ -106,6 +92,29 @@ namespace GameJam
 				{
 					var enemy = await SpawnEnemy(spawn.EntityPrefab, _game, spawn.Position);
 					_state.Enemies.Add(enemy);
+				}
+			}
+
+			if (_state.HelpReceived && Time.time > _spawnHelperTimestamp)
+			{
+				for (var helperIndex = 0; helperIndex < _state.Helpers.Length; helperIndex++)
+				{
+					if (_state.Helpers[helperIndex] != null)
+					{
+						continue;
+					}
+
+					var helperName = _state.HelpersName[Random.Range(0, _state.HelpersName.Count)];
+					var position = new Vector3(0f, Game.Bounds.min.y, 0f);
+					var entity = await SpawnHelper(_config.HelperPrefab, helperIndex, helperName, _game, position);
+					_state.Helpers[helperIndex] = entity;
+
+					if (helperIndex + 1 < Game.HELPERS_MAX_COUNT)
+					{
+						_spawnHelperTimestamp = Time.time + Game.HELPERS_SPAWN_INTERVAL;
+					}
+
+					break;
 				}
 			}
 
@@ -133,9 +142,11 @@ namespace GameJam
 
 			foreach (var helper in _state.Helpers)
 			{
-				GameObject.Destroy(helper.gameObject);
+				if (helper != null)
+				{
+					GameObject.Destroy(helper.gameObject);
+				}
 			}
-			_state.Helpers.Clear();
 
 			foreach (var enemy in _state.Enemies)
 			{
