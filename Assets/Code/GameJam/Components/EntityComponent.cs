@@ -15,6 +15,7 @@ namespace GameJam
 		[SerializeField] public Alliances Alliance;
 		[SerializeField] public Brain Brain;
 		[SerializeField] public Vector3 RotationPerTick;
+		[SerializeField] public SpriteRenderer[] Parts;
 
 		[HideInInspector] public int Health = 1	;
 		[HideInInspector] public float CanFireTimestamp;

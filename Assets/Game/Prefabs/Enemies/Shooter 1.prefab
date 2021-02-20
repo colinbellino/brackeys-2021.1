@@ -314,6 +314,7 @@ MonoBehaviour:
   Alliance: 0
   Brain: 1
   RotationPerTick: {x: 0, y: 0, z: 15}
+  Parts: []
   Health: 1
   CanFireTimestamp: 0
   MoveDestination: {x: 0, y: 0, z: 0}
