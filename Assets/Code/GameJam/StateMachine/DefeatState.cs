@@ -47,7 +47,7 @@ namespace GameJam
 				return;
 			}
 
-			_ui.ShowReceiveHelp(_helpers[0]);
+			_ui.ShowReceiveHelp(_helpers[Random.Range(0, _helpers.Count)]);
 			_ui.ReceiveHelpYesButton.onClick.AddListener(RestartWithHelp);
 			_ui.ReceiveHelpNoButton.onClick.AddListener(RestartWithoutHelp);
 		}

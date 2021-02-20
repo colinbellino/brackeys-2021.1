@@ -131,18 +131,23 @@ namespace GameJam
 				GameObject.Destroy(_state.Player.gameObject);
 			}
 
-			foreach (var enemy in _state.Enemies)
-			{
-				GameObject.Destroy(enemy.gameObject);
-			}
 			foreach (var helper in _state.Helpers)
 			{
 				GameObject.Destroy(helper.gameObject);
 			}
+			_state.Helpers.Clear();
+
+			foreach (var enemy in _state.Enemies)
+			{
+				GameObject.Destroy(enemy.gameObject);
+			}
+			_state.Enemies.Clear();
+
 			foreach (var projectile in _state.Projectiles)
 			{
 				_projectileSpawner.Despawn(projectile);
 			}
+			_state.Projectiles.Clear();
 
 			_ui.HideGameplay();
 
