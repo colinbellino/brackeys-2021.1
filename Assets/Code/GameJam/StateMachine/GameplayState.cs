@@ -162,7 +162,10 @@ namespace GameJam
 
 			foreach (var enemy in _state.Enemies)
 			{
-				GameObject.Destroy(enemy.gameObject);
+				if (enemy != null)
+				{
+					GameObject.Destroy(enemy.gameObject);
+				}
 			}
 			_state.Enemies.Clear();
 

@@ -1,5 +1,7 @@
-﻿using Cysharp.Threading.Tasks;
+﻿using System;
+using Cysharp.Threading.Tasks;
 using DG.Tweening;
+using Unity.VectorGraphics;
 using UnityEngine;
 using UnityEngine.UI;
 using Button = UnityEngine.UI.Button;
@@ -10,6 +12,7 @@ namespace GameJam
 	{
 		[Header("Gameplay")]
 		[SerializeField] private GameObject _gameplayRoot;
+		[SerializeField] private SVGImage[] _countdownImages;
 		[SerializeField] private Text _debugText;
 		[Header("Victory")]
 		[SerializeField] private GameObject _victoryRoot;
@@ -17,6 +20,7 @@ namespace GameJam
 		[SerializeField] public Button RetryNoButton;
 		[Header("Defeat")]
 		[SerializeField] private GameObject _giveUpRoot;
+		[SerializeField] private Text _giveUpText;
 		[SerializeField] public Button GiveUpYesButton;
 		[SerializeField] public Button GiveUpNoButton;
 		[SerializeField] private GameObject _receiveHelpRoot;
@@ -32,8 +36,6 @@ namespace GameJam
 			HideVictory();
 			HideGiveUp();
 			HideReceiveHelp();
-
-			// _fadeToBlackImage.color = Color.clear;
 		}
 
 		public void ShowGameplay() { _gameplayRoot.SetActive(true); }
@@ -42,7 +44,23 @@ namespace GameJam
 		public void ShowVictory() { _victoryRoot.SetActive(true); }
 		public void HideVictory() { _victoryRoot.SetActive(false); }
 
-		public void ShowGiveUp() { _giveUpRoot.SetActive(true); }
+		public void SetCounter(int deathCounter)
+		{
+			_countdownImages[0].gameObject.SetActive(deathCounter < 1);
+			_countdownImages[1].gameObject.SetActive(deathCounter < 2);
+			_countdownImages[2].gameObject.SetActive(deathCounter < 3);
+		}
+
+		public void ShowGiveUp(int deathCounter)
+		{
+			_giveUpText.text = deathCounter switch
+			{
+				0 => $"Give up here?",
+				1 => $"Just give up already?!",
+				_ => $"You can't do it... \nGive up?"
+			};
+			_giveUpRoot.SetActive(true);
+		}
 		public void HideGiveUp() { _giveUpRoot.SetActive(false); }
 		public void ShowReceiveHelp(string helperName)
 		{

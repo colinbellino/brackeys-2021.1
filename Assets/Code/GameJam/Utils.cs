@@ -24,7 +24,7 @@ namespace GameJam
 	        var origin = position;
 	        origin.y = Game.Bounds.max.y;
 	        var entity = GameObject.Instantiate(prefab, origin, Quaternion.identity);
-	        entity.StateMachine = new UnitStateMachine(true, game, entity);
+	        entity.StateMachine = new UnitStateMachine(false, game, entity);
 	        entity.MoveDestination = position;
 	        entity.Health = entity.StartingHealth;
 	        await entity.StateMachine.Start();
