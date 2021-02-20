@@ -43,3 +43,16 @@ MonoBehaviour:
       EntityPrefab: {fileID: 4246819502291371097, guid: d25d48f1b32a0074faf110eb329802d3, type: 3}
     - Position: {x: 9, y: 0}
       EntityPrefab: {fileID: 4246819502291371097, guid: d25d48f1b32a0074faf110eb329802d3, type: 3}
+  - Spawns:
+    - Position: {x: -12, y: 4}
+      EntityPrefab: {fileID: 4246819502291371097, guid: 0e32ce7e953cc994a9b00cddd4ea9034, type: 3}
+    - Position: {x: -4, y: 2}
+      EntityPrefab: {fileID: 4246819502291371097, guid: 0e32ce7e953cc994a9b00cddd4ea9034, type: 3}
+    - Position: {x: 4, y: 2}
+      EntityPrefab: {fileID: 4246819502291371097, guid: 0e32ce7e953cc994a9b00cddd4ea9034, type: 3}
+    - Position: {x: 12, y: 4}
+      EntityPrefab: {fileID: 4246819502291371097, guid: 0e32ce7e953cc994a9b00cddd4ea9034, type: 3}
+    - Position: {x: -7, y: 0}
+      EntityPrefab: {fileID: 4246819502291371097, guid: d25d48f1b32a0074faf110eb329802d3, type: 3}
+    - Position: {x: 7, y: 0}
+      EntityPrefab: {fileID: 4246819502291371097, guid: d25d48f1b32a0074faf110eb329802d3, type: 3}
