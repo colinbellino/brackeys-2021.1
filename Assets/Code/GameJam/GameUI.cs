@@ -33,7 +33,7 @@ namespace GameJam
 			HideGiveUp();
 			HideReceiveHelp();
 
-			_fadeToBlackImage.color = Color.clear;
+			// _fadeToBlackImage.color = Color.clear;
 		}
 
 		public void ShowGameplay() { _gameplayRoot.SetActive(true); }
@@ -52,8 +52,8 @@ namespace GameJam
 		}
 		public void HideReceiveHelp() { _receiveHelpRoot.SetActive(false); }
 
-		public async UniTask StartFadeToBlack() { await _fadeToBlackImage.DOColor(Color.black, 0.5f); }
-		public async UniTask EndFadeToBlack() { await _fadeToBlackImage.DOColor(Color.clear, 0.5f); }
+		public async UniTask StartFadeToBlack(float duration = 1f) { await _fadeToBlackImage.DOColor(Color.black, duration); }
+		public async UniTask EndFadeToBlack(float duration = 1f) { await _fadeToBlackImage.DOColor(Color.clear, duration); }
 
 		public void SetDebugText(string value)
 		{

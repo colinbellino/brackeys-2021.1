@@ -10,6 +10,8 @@ namespace GameJam
 
         private void Awake()
         {
+	        var _musicAudioSource = GameObject.Find("Music Audio Source").GetComponent<AudioSource>();
+
 	        Game = new Game();
             Game.Config = Resources.Load<GameConfig>("Game Config");
             Game.Controls = new GameControls();
@@ -17,6 +19,7 @@ namespace GameJam
             Game.UI = FindObjectOfType<GameUI>();
             Game.State = new GameState();
             Game.ProjectileSpawner = new ProjectileSpawner();
+            Game.AudioPlayer = new AudioPlayer(Game.Config, _musicAudioSource);
 
 	        _machine = new GameStateMachine(false, Game);
         }
