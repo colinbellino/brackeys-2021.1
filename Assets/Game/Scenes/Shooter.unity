@@ -847,20 +847,20 @@ MonoBehaviour:
   - {fileID: 477056629}
   - {fileID: 168534066}
   _debugText: {fileID: 281640838}
-  _victoryRoot: {fileID: 1122596339}
+  _victoryRoot: {fileID: 1122596341}
   _victoryText: {fileID: 1522656619}
   _titleText: {fileID: 1180226830}
   VictoryNextButton: {fileID: 1876501317}
-  _commentRoot: {fileID: 981352611}
+  _commentRoot: {fileID: 981352613}
   CommentNextButton: {fileID: 1433070917}
-  _retryRoot: {fileID: 246723028}
+  _retryRoot: {fileID: 246723030}
   RetryYesButton: {fileID: 1532045383}
   RetryNoButton: {fileID: 1999491453}
-  _giveUpRoot: {fileID: 419714566}
+  _giveUpRoot: {fileID: 419714568}
   _giveUpText: {fileID: 451354330}
   GiveUpYesButton: {fileID: 142269297}
   GiveUpNoButton: {fileID: 966126937}
-  _receiveHelpRoot: {fileID: 1491717903}
+  _receiveHelpRoot: {fileID: 1491717905}
   _receiveHelpText: {fileID: 1659208079}
   ReceiveHelpYesButton: {fileID: 926161263}
   ReceiveHelpNoButton: {fileID: 428158741}
