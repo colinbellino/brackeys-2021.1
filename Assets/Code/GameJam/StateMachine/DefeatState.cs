@@ -58,7 +58,6 @@ namespace GameJam
 			_ui.HideReceiveHelp();
 
 			await _audioPlayer.StopMusic(1f);
-			// await _ui.EndFadeToBlack();
 
 			_state.HelpersName = _helpers;
 			_state.HelpReceived = true;
@@ -69,8 +68,6 @@ namespace GameJam
 		private async void RestartWithoutHelp()
 		{
 			_ui.HideReceiveHelp();
-
-			await _ui.EndFadeToBlack();
 
 			_machine.Fire(GameStateMachine.Triggers.Retry);
 		}

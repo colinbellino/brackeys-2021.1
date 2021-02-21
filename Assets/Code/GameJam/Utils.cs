@@ -1,24 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace GameJam
 {
 	public static class Utils
 	{
-		public static Game FindGameInstance()
-		{
-			var manager = GameObject.FindObjectOfType<GameManager>();
-			if (manager == null)
-			{
-				throw new Exception("Couldn't find GameManager in scene.");
-			}
-
-			return manager.Game;
-		}
-
         public static async UniTask<EntityComponent> SpawnEnemy(EntityComponent prefab, Game game, Vector3 position)
         {
 	        var origin = position;
@@ -36,6 +23,7 @@ namespace GameJam
 	        var entity = GameObject.Instantiate(prefab, position, Quaternion.identity);
 	        entity.transform.name = "Leader";
 	        entity.Health = entity.StartingHealth;
+	        entity.MoveDestination = Game.PLAYER_SPAWN_POSITION;
 	        entity.StateMachine = new UnitStateMachine(false, game, entity);
 	        await entity.StateMachine.Start();
 	        return entity;

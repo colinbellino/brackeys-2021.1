@@ -27,7 +27,11 @@ namespace GameJam
 				_ui.ShowGameplay();
 				_ui.SetDebugText("DEBUG MENU \n- F1: Trigger win \n- F2: Trigger loss \n- F3: Trigger loss (with helpers)");
 			}
-			await _ui.EndFadeToBlack();
+
+			if (_state.DeathCounter > 0)
+			{
+				_state.Player = await SpawnPlayer(_config.PlayerPrefab, _game, Game.PLAYER_SPAWN_POSITION);
+			}
 
 			if (_audioPlayer.IsMusicPlaying() == false)
 			{
@@ -35,8 +39,14 @@ namespace GameJam
 				_audioPlayer.PlayMusic(music, false, 0.5f);
 			}
 
+			await _ui.EndFadeToBlack();
+			if (_state.DeathCounter == 0)
+			{
+				_state.Player = await SpawnPlayer(_config.PlayerPrefab, _game, new Vector3(0f, Game.Bounds.min.y, 0f));
+				await UniTask.Delay(3000); // Wait for player to move in position
+			}
+
 			_spawnHelperTimestamp = Time.time + Game.HELPERS_SPAWN_INTERVAL;
-			_state.Player = await SpawnPlayer(_config.PlayerPrefab, _game, Vector3.zero);
 			_transitionDone = true;
 
 			_controls.Gameplay.Enable();
