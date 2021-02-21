@@ -10,7 +10,8 @@ namespace GameJam
 		{
 			await base.Enter();
 
-			_ui.ShowVictory();
+			_ui.ShowVictory(_state.HelpReceived);
+			_ui.VictoryNextButton.onClick.AddListener(VictoryNextClicked);
 			_ui.RetryYesButton.onClick.AddListener(RetryYesClicked);
 			_ui.RetryNoButton.onClick.AddListener(RetryNoClicked);
 		}
@@ -19,15 +20,22 @@ namespace GameJam
 		{
 			await base.Exit();
 
+			_ui.VictoryNextButton.onClick.RemoveListener(VictoryNextClicked);
 			_ui.RetryYesButton.onClick.RemoveListener(RetryYesClicked);
 			_ui.RetryNoButton.onClick.RemoveListener(RetryNoClicked);
 		}
 
-		private async void RetryYesClicked()
+		private void VictoryNextClicked()
 		{
 			_ui.HideVictory();
+			_ui.ShowRetry();
+		}
 
-			await _ui.EndFadeToBlack();
+		private async void RetryYesClicked()
+		{
+			_ui.HideRetry();
+
+			await _ui.FadeOut();
 
 			_machine.Fire(GameStateMachine.Triggers.Retry);
 		}
