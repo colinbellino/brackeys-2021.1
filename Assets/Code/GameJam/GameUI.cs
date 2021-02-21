@@ -13,6 +13,7 @@ namespace GameJam
 		[Header("Gameplay")]
 		[SerializeField] private GameObject _gameplayRoot;
 		[SerializeField] private SVGImage[] _countdownImages;
+		[SerializeField] private TMP_Text _notification;
 		[SerializeField] private Text _debugText;
 		[Header("Victory")]
 		[SerializeField] private Image _victoryRoot;
@@ -54,6 +55,7 @@ namespace GameJam
 			_ = HideRetry(0f);
 			_ = HideComment(0f);
 			_ = HideTitle(0f);
+			_ = HideNotification(0f);
 
 			VictoryNextButton.onClick.AddListener(PlayButtonClip);
 			CommentNextButton.onClick.AddListener(PlayButtonClip);
@@ -153,6 +155,19 @@ namespace GameJam
 		public async UniTask HideReceiveHelp(float duration = 0.5f)
 		{
 			await FadeOutPanel(_receiveHelpRoot, duration);
+		}
+
+		public async UniTask ShowNotification(string entityName)
+		{
+			_notification.text = $"{entityName}'s ship was destroyed.";
+
+			await _notification.DOFade(1f, 0.5f);
+			await UniTask.Delay(2000);
+			await HideNotification(0f);
+		}
+		public async UniTask HideNotification(float duration = 0.5f)
+		{
+			await _notification.DOFade(0f, duration);
 		}
 
 		public async UniTask FadeIn(Color color, float duration = 1f)

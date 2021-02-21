@@ -103,10 +103,6 @@ MonoBehaviour:
     - Position: {x: 9, y: 4}
       EntityPrefab: {fileID: 4246819502291371097, guid: 14da29968323e0f4c9827e94462d3698, type: 3}
   - Spawns:
-    - Position: {x: -9, y: 4}
-      EntityPrefab: {fileID: 4246819502291371097, guid: 14da29968323e0f4c9827e94462d3698, type: 3}
-    - Position: {x: 9, y: 4}
-      EntityPrefab: {fileID: 4246819502291371097, guid: 14da29968323e0f4c9827e94462d3698, type: 3}
     - Position: {x: -5, y: 0}
       EntityPrefab: {fileID: 4246819502291371097, guid: 14da29968323e0f4c9827e94462d3698, type: 3}
     - Position: {x: 5, y: 0}

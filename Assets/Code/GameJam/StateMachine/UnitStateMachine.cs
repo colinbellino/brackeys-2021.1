@@ -312,6 +312,16 @@ namespace GameJam
 			{
 				await base.Enter();
 
+				if (_actor.DestroyedClip)
+				{
+					_ = _game.AudioPlayer.PlaySoundEffect(_actor.DestroyedClip);
+				}
+
+				if (_actor.Brain == Brain.Helper)
+				{
+					_ = _game.UI.ShowNotification(_actor.Name);
+				}
+
 				if (_actor == _game.State.Player)
 				{
 					foreach (var helper in _game.State.Helpers)
