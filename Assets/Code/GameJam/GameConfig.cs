@@ -21,6 +21,7 @@ namespace GameJam
 		public AudioMixerSnapshot PauseAudioSnapshot;
 		public AudioClip MainMusic;
 		public AudioClip HelpReceivedMusic;
+		public AudioClip MenuTextAppearClip;
 		public AudioClip MenuConfirmClip;
 		[Range(0f, 1f)] public float MusicVolume = 1f;
 		[Range(0f, 1f)] public float SoundVolume = 1f;

@@ -38,8 +38,15 @@ namespace GameJam
 		[Header("Transitions")]
 		[SerializeField] private Image _fadeToBlackImage;
 
-		private void Awake()
+		private AudioPlayer _audioPlayer;
+		private GameConfig _config;
+
+		private void Start()
 		{
+			var gameManager = FindObjectOfType<GameManager>();
+			_audioPlayer = gameManager.Game.AudioPlayer;
+			_config = gameManager.Game.Config;
+
 			HideGameplay();
 			_ = HideVictory(0f);
 			_ = HideGiveUp(0f);
@@ -47,6 +54,20 @@ namespace GameJam
 			_ = HideRetry(0f);
 			_ = HideComment(0f);
 			_ = HideTitle(0f);
+
+			VictoryNextButton.onClick.AddListener(PlayButtonClip);
+			CommentNextButton.onClick.AddListener(PlayButtonClip);
+			RetryYesButton.onClick.AddListener(PlayButtonClip);
+			RetryNoButton.onClick.AddListener(PlayButtonClip);
+			GiveUpYesButton.onClick.AddListener(PlayButtonClip);
+			GiveUpNoButton.onClick.AddListener(PlayButtonClip);
+			ReceiveHelpYesButton.onClick.AddListener(PlayButtonClip);
+			ReceiveHelpNoButton.onClick.AddListener(PlayButtonClip);
+		}
+
+		private void PlayButtonClip()
+		{
+			_audioPlayer.PlaySoundEffect(_config.MenuConfirmClip);
 		}
 
 		public void ShowGameplay() { _gameplayRoot.SetActive(true); }
@@ -146,11 +167,19 @@ namespace GameJam
 		private async UniTask FadeInPanel(Image panel, TMP_Text text, float duration)
 		{
 			panel.gameObject.SetActive(true);
+
+			foreach (var t in panel.GetComponentsInChildren<TMP_Text>())
+			{
+				_ = t.DOFade(1f, 0f);
+			}
+
 			_ = panel.DOFade(1f, duration);
 
 			text.maxVisibleCharacters = 0;
 
 			await UniTask.Delay(TimeSpan.FromSeconds(duration));
+
+			_audioPlayer.PlaySoundEffect(_config.MenuTextAppearClip);
 
 			var totalInvisibleCharacters = text.textInfo.characterCount;
 			var counter = 0;
@@ -166,11 +195,10 @@ namespace GameJam
 
 				counter += 1;
 
-				await UniTask.Delay(10);
+				await UniTask.Delay(12);
 			}
 
-			var buttons = panel.GetComponentsInChildren<Button>();
-			foreach (var button in buttons)
+			foreach (var button in panel.GetComponentsInChildren<Button>())
 			{
 				_ = button.image.DOFade(1f, duration);
 			}
@@ -180,10 +208,9 @@ namespace GameJam
 		{
 			_ = panel.DOFade(0f, duration);
 
-			var buttons = panel.GetComponentsInChildren<Button>();
-			foreach (var button in buttons)
+			foreach (var graphic in panel.GetComponentsInChildren<Graphic>())
 			{
-				_ = button.image.DOFade(0f, duration);
+				_ = graphic.DOFade(0f, duration);
 			}
 
 			await UniTask.Delay(TimeSpan.FromSeconds(duration));
