@@ -36,12 +36,13 @@ namespace GameJam
 			_machine = new StateMachine<States, Triggers>(States.Inactive);
 
 			_machine.Configure(States.Inactive)
-				.PermitDynamicIf(Triggers.Done, () => States.PlayerControl, () => _actor.Brain == Brain.Player)
+				.PermitDynamicIf(Triggers.Done, () => States.MoveInPosition, () => _actor.Brain == Brain.Player)
 				.PermitDynamicIf(Triggers.Done, () => States.Helper, () => _actor.Brain == Brain.Helper)
 				.PermitDynamicIf(Triggers.Done, () => States.MoveInPosition, () => _actor.Brain == Brain.Shooter)
 				.PermitDynamicIf(Triggers.Done, () => States.MoveInPosition, () => _actor.Brain == Brain.Roamer);
 
 			_machine.Configure(States.MoveInPosition)
+				.PermitDynamicIf(Triggers.Done, () => States.PlayerControl, () => _actor.Brain == Brain.Player)
 				.PermitDynamicIf(Triggers.Done, () => States.IdleShooter, () => _actor.Brain == Brain.Shooter)
 				.PermitDynamicIf(Triggers.Done, () => States.Roamer, () => _actor.Brain == Brain.Roamer)
 				.Permit(Triggers.Destroyed, States.Destroy);

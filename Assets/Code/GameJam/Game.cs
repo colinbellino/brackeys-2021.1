@@ -13,6 +13,7 @@ namespace GameJam
 		public ProjectileSpawner ProjectileSpawner;
 		public AudioPlayer AudioPlayer;
 
+		public static Vector3 PLAYER_SPAWN_POSITION = new Vector3(0f, -2f, 0f);
 		public const float HELPERS_SPAWN_INTERVAL = 1f;
 		public const float HELPERS_RADIUS = 1.5f;
 		public const int HELPERS_MAX_COUNT = 5;
