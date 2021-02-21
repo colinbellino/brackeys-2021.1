@@ -1,5 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using DG.Tweening;
+using TMPro;
 using Unity.VectorGraphics;
 using UnityEngine;
 using UnityEngine.UI;
@@ -15,18 +16,21 @@ namespace GameJam
 		[SerializeField] private Text _debugText;
 		[Header("Victory")]
 		[SerializeField] private GameObject _victoryRoot;
-		[SerializeField] private Text _victoryText;
+		[SerializeField] private TMP_Text _victoryText;
+		[SerializeField] private TMP_Text _titleText;
 		[SerializeField] public Button VictoryNextButton;
+		[SerializeField] private GameObject _commentRoot;
+		[SerializeField] public Button CommentNextButton;
 		[SerializeField] private GameObject _retryRoot;
 		[SerializeField] public Button RetryYesButton;
 		[SerializeField] public Button RetryNoButton;
 		[Header("Defeat")]
 		[SerializeField] private GameObject _giveUpRoot;
-		[SerializeField] private Text _giveUpText;
+		[SerializeField] private TMP_Text _giveUpText;
 		[SerializeField] public Button GiveUpYesButton;
 		[SerializeField] public Button GiveUpNoButton;
 		[SerializeField] private GameObject _receiveHelpRoot;
-		[SerializeField] private Text _receiveHelpText;
+		[SerializeField] private TMP_Text _receiveHelpText;
 		[SerializeField] public Button ReceiveHelpYesButton;
 		[SerializeField] public Button ReceiveHelpNoButton;
 		[Header("Transitions")]
@@ -39,10 +43,15 @@ namespace GameJam
 			HideGiveUp();
 			HideReceiveHelp();
 			HideRetry();
+			HideComment();
+			HideTitle(0f);
 		}
 
 		public void ShowGameplay() { _gameplayRoot.SetActive(true); }
 		public void HideGameplay() { _gameplayRoot.SetActive(false); }
+
+		public async UniTask ShowTitle() => await _titleText.DOFade(1f, 0.5f);
+		public async UniTask HideTitle(float duration = 0.5f) => await _titleText.DOFade(0f, duration);
 
 		public void ShowVictory(bool helpReceived)
 		{
@@ -52,11 +61,20 @@ namespace GameJam
 			}
 			else
 			{
-				_victoryText.text = $"You managed to beat the game all by yourself, impressive. Though remember there is no shame in accepting the help of others from time to time!";
+				_victoryText.text = $"You managed to beat the game all by yourself, impressive! But remember there is no shame in accepting the help of others from time to time.";
 			}
 			_victoryRoot.SetActive(true);
 		}
 		public void HideVictory() { _victoryRoot.SetActive(false); }
+
+		public void ShowComment()
+		{
+			_commentRoot.SetActive(true);
+		}
+		public void HideComment()
+		{
+			_commentRoot.SetActive(false);
+		}
 
 		public void ShowRetry()
 		{

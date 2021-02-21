@@ -1,4 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
+using UnityEngine;
 
 namespace GameJam
 {
@@ -10,10 +11,14 @@ namespace GameJam
 		{
 			await base.Enter();
 
+			await _ui.ShowTitle();
 			_ui.ShowVictory(_state.HelpReceived);
 			_ui.VictoryNextButton.onClick.AddListener(VictoryNextClicked);
+			_ui.CommentNextButton.onClick.AddListener(CommentNextClicked);
 			_ui.RetryYesButton.onClick.AddListener(RetryYesClicked);
 			_ui.RetryNoButton.onClick.AddListener(RetryNoClicked);
+
+			_ = _audioPlayer.StopMusic(5f);
 		}
 
 		public override async UniTask Exit()
@@ -21,6 +26,7 @@ namespace GameJam
 			await base.Exit();
 
 			_ui.VictoryNextButton.onClick.RemoveListener(VictoryNextClicked);
+			_ui.CommentNextButton.onClick.RemoveListener(CommentNextClicked);
 			_ui.RetryYesButton.onClick.RemoveListener(RetryYesClicked);
 			_ui.RetryNoButton.onClick.RemoveListener(RetryNoClicked);
 		}
@@ -28,14 +34,19 @@ namespace GameJam
 		private void VictoryNextClicked()
 		{
 			_ui.HideVictory();
+			_ui.ShowComment();
+		}
+
+		private void CommentNextClicked()
+		{
+			_ui.HideComment();
 			_ui.ShowRetry();
 		}
 
 		private async void RetryYesClicked()
 		{
 			_ui.HideRetry();
-
-			await _ui.FadeOut();
+			await _ui.HideTitle(0f);
 
 			_machine.Fire(GameStateMachine.Triggers.Retry);
 		}
