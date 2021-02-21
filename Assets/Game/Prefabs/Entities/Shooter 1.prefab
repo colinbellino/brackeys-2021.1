@@ -315,7 +315,8 @@ MonoBehaviour:
   Alliance: 0
   Brain: 2
   RotationPerTick: {x: 0, y: 0, z: 15}
-  Parts: []
+  Parts:
+  - {fileID: 2475464351843699894}
   Health: 1
   RotationOffset: 0
   CanFireTimestamp: 0
