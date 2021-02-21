@@ -14,7 +14,16 @@ namespace GameJam
 		[HideInInspector] public Projectile Data;
 
 		public Action Destroyed;
-		public Action<ProjectileComponent, Collider2D> TriggerEntered;
+
+		private GameState _state;
+		private AudioPlayer _audioPlayer;
+
+		private void Awake()
+		{
+			var gameManager = FindObjectOfType<GameManager>();
+			_state = gameManager.Game.State;
+			_audioPlayer = gameManager.Game.AudioPlayer;
+		}
 
 		private void Update()
 		{
@@ -32,7 +41,33 @@ namespace GameJam
 
 		private void OnTriggerEnter2D(Collider2D collider)
 		{
-			TriggerEntered?.Invoke(this, collider);
+			if (_state.Running == false)
+			{
+				return;
+			}
+
+			var otherEntity = collider.GetComponentInParent<EntityComponent>();
+			if (otherEntity != null && otherEntity.Alliance != this.Alliance)
+			{
+				HitEntity(otherEntity, _audioPlayer);
+
+				HitProjectile(this);
+				return;
+			}
+
+			var otherProjectile = collider.GetComponentInParent<ProjectileComponent>();
+			if (otherProjectile != null && otherProjectile.Alliance != this.Alliance)
+			{
+				if (this.Data.CanDestroyOtherProjectiles && otherProjectile.Data.CanBeDestroyed)
+				{
+					HitProjectile(otherProjectile);
+				}
+
+				if (otherProjectile.Data.CanDestroyOtherProjectiles && this.Data.CanBeDestroyed)
+				{
+					HitProjectile(this);
+				}
+			}
 		}
 	}
 }

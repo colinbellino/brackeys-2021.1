@@ -134,7 +134,7 @@ namespace GameJam
 		{
 			_giveUpText.text = deathCounter switch
 			{
-				0 => $"So... You died. \n\nDo you want to give up here?",
+				0 => $"You died.... \n\nDo you want to give up here?",
 				1 => $"Again? \n\nWhy don't you just give up already?!",
 				_ => $"You can't do this alone... \n\nGive up?"
 			};
@@ -179,7 +179,7 @@ namespace GameJam
 
 			await UniTask.Delay(TimeSpan.FromSeconds(duration));
 
-			_audioPlayer.PlaySoundEffect(_config.MenuTextAppearClip);
+			_ = _audioPlayer.PlaySoundEffect(_config.MenuTextAppearClip);
 
 			var totalInvisibleCharacters = text.textInfo.characterCount;
 			var counter = 0;

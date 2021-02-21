@@ -709,6 +709,9 @@ MonoBehaviour:
   InvulnerabilityDuration: 0
   Parts:
   - {fileID: 2475464351843699894}
+  FireClip: {fileID: 0}
+  DamagedClip: {fileID: 8300000, guid: 4c07bddc5f87c2043a43184b4a594c63, type: 3}
+  DestroyedClip: {fileID: 8300000, guid: b325abb1031150b48b25006374289d49, type: 3}
   Health: 1
   RotationOffset: 0
   CanFireTimestamp: 0

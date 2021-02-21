@@ -61,53 +61,26 @@ namespace GameJam
 	        return mouseWorldPosition;
         }
 
-        public static void FireProjectile(EntityComponent entity, GameState state, ProjectileSpawner projectileSpawner)
+        public static void FireProjectile(EntityComponent entity, GameState state, AudioPlayer audioPlayer, ProjectileSpawner projectileSpawner)
         {
 	        if (entity == null || Time.time < entity.CanFireTimestamp)
 	        {
 		        return;
 	        }
 
+	        if (entity.FireClip)
+	        {
+		        _ = audioPlayer.PlaySoundEffect(entity.FireClip);
+	        }
+
 	        foreach (var shooter in entity.Shooters)
 	        {
 		        var projectile = projectileSpawner.Spawn(entity, shooter);
 		        projectile.Destroyed += () => projectileSpawner.Despawn(projectile);
-		        projectile.TriggerEntered += (projectile, collider) => OnProjectileTriggerEnter(projectile, collider, state);
 		        state.Projectiles.Add(projectile);
 	        }
 
 	        entity.CanFireTimestamp = Time.time + entity.FireRate;
-        }
-
-        private static void OnProjectileTriggerEnter(ProjectileComponent projectile, Collider2D collider, GameState state)
-        {
-	        if (state.Running == false)
-	        {
-		        return;
-	        }
-
-	        var otherEntity = collider.GetComponentInParent<EntityComponent>();
-	        if (otherEntity != null && otherEntity.Alliance != projectile.Alliance)
-	        {
-		        HitEntity(otherEntity);
-
-		        HitProjectile(projectile);
-		        return;
-	        }
-
-	        var otherProjectile = collider.GetComponentInParent<ProjectileComponent>();
-	        if (otherProjectile != null && otherProjectile.Alliance != projectile.Alliance)
-	        {
-		        if (projectile.Data.CanDestroyOtherProjectiles && otherProjectile.Data.CanBeDestroyed)
-		        {
-			        HitProjectile(otherProjectile);
-		        }
-
-		        if (otherProjectile.Data.CanDestroyOtherProjectiles && projectile.Data.CanBeDestroyed)
-		        {
-			        HitProjectile(projectile);
-		        }
-	        }
         }
 
         public static async UniTask<List<string>> LoadHelpers()
@@ -129,7 +102,7 @@ namespace GameJam
 	        }
         }
 
-        public static void HitEntity(EntityComponent entity)
+        public static void HitEntity(EntityComponent entity, AudioPlayer audioPlayer)
         {
 	        if (Time.time < entity.InvulnerabilityTimestamp)
 	        {
@@ -152,7 +125,19 @@ namespace GameJam
 
 	        if (entity.Health <= 0)
 	        {
+		        if (entity.DestroyedClip)
+		        {
+			        _ = audioPlayer.PlaySoundEffect(entity.DestroyedClip);
+		        }
+
 		        entity.StateMachine.Fire(UnitStateMachine.Triggers.Destroyed);
+	        }
+	        else
+	        {
+		        if (entity.DamagedClip)
+		        {
+			        _ = audioPlayer.PlaySoundEffect(entity.DamagedClip);
+		        }
 	        }
         }
 

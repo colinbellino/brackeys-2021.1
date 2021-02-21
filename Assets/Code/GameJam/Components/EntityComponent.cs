@@ -18,6 +18,9 @@ namespace GameJam
 		[SerializeField] public Vector3 RotationPerTick;
 		[SerializeField] public double InvulnerabilityDuration;
 		[SerializeField] public SpriteRenderer[] Parts;
+		[SerializeField] public AudioClip FireClip;
+		[SerializeField] public AudioClip DamagedClip;
+		[SerializeField] public AudioClip DestroyedClip;
 
 		[HideInInspector] public int Health = 1;
 		[HideInInspector] public float RotationOffset;
