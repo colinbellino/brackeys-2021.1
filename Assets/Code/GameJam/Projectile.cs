@@ -12,5 +12,6 @@ namespace GameJam
 		public float HitColliderRadius = 0.3f;
 		public bool CanBeDestroyed;
 		public bool CanDestroyOtherProjectiles = true;
+		public ParticleSystem HitParticle;
 	}
 }
