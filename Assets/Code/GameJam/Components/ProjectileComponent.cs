@@ -1,6 +1,6 @@
 ﻿using System;
-using DG.Tweening;
 using UnityEngine;
+using static GameJam.Utils;
 
 namespace GameJam
 {
@@ -13,7 +13,7 @@ namespace GameJam
 		[HideInInspector] public Alliances Alliance;
 		[HideInInspector] public Projectile Data;
 
-		public event Action Destroyed;
+		public Action Destroyed;
 
 		private void Update()
 		{
@@ -53,32 +53,6 @@ namespace GameJam
 					HitProjectile(this);
 				}
 			}
-		}
-
-		public static void HitEntity(EntityComponent entity)
-		{
-			entity.Health -= 1;
-
-			entity.Parts[0].transform.DOShakePosition(0.2f, 0.15f, 20, 90f, false, true);
-
-			if (entity.Parts.Length > 0)
-			{
-				for (var partIndex = 0; partIndex < entity.Parts.Length; partIndex++)
-				{
-					var part = entity.Parts[partIndex];
-					part.gameObject.SetActive(entity.Health > partIndex);
-				}
-			}
-
-			if (entity.Health <= 0)
-			{
-				entity.StateMachine.Fire(UnitStateMachine.Triggers.Destroyed);
-			}
-		}
-
-		public static void HitProjectile(ProjectileComponent component)
-		{
-			component.Destroyed?.Invoke();
 		}
 	}
 }
