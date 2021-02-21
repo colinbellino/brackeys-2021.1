@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -94,6 +95,38 @@ namespace GameJam
 		        Debug.Log("Couldn't load data from server, falling back to placeholders.");
 		        return Game.PlaceholderNames;
 	        }
+        }
+
+        public static void HitEntity(EntityComponent entity)
+        {
+	        if (Time.time < entity.InvulnerabilityTimestamp)
+	        {
+		        return;
+	        }
+
+	        entity.Health -= 1;
+	        entity.InvulnerabilityTimestamp = Time.time + entity.InvulnerabilityDuration;
+
+	        entity.Parts[0].transform.DOShakePosition(0.2f, 0.15f, 20, 90f, false, true);
+
+	        if (entity.Parts.Length > 0)
+	        {
+		        for (var partIndex = 0; partIndex < entity.Parts.Length; partIndex++)
+		        {
+			        var part = entity.Parts[partIndex];
+			        part.gameObject.SetActive(entity.Health > partIndex);
+		        }
+	        }
+
+	        if (entity.Health <= 0)
+	        {
+		        entity.StateMachine.Fire(UnitStateMachine.Triggers.Destroyed);
+	        }
+        }
+
+        public static void HitProjectile(ProjectileComponent component)
+        {
+	        component.Destroyed?.Invoke();
         }
 	}
 }

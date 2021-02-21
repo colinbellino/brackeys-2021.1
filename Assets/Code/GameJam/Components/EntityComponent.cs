@@ -16,6 +16,7 @@ namespace GameJam
 		[SerializeField] public Alliances Alliance;
 		[SerializeField] public Brain Brain;
 		[SerializeField] public Vector3 RotationPerTick;
+		[SerializeField] public double InvulnerabilityDuration;
 		[SerializeField] public SpriteRenderer[] Parts;
 
 		[HideInInspector] public int Health = 1;
@@ -26,6 +27,7 @@ namespace GameJam
 		[HideInInspector] public IEnumerable<ShooterComponent> Shooters;
 		[HideInInspector] public int HelperIndex;
 		[HideInInspector] public float HelperAngle;
+		[HideInInspector] public double InvulnerabilityTimestamp;
 
 		private void Awake()
 		{
