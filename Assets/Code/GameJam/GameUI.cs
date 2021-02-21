@@ -20,8 +20,10 @@ namespace GameJam
 		[SerializeField] private TMP_Text _titleText;
 		[SerializeField] public Button VictoryNextButton;
 		[SerializeField] private Image _commentRoot;
+		[SerializeField] private TMP_Text _commentText;
 		[SerializeField] public Button CommentNextButton;
 		[SerializeField] private Image _retryRoot;
+		[SerializeField] private TMP_Text _retryText;
 		[SerializeField] public Button RetryYesButton;
 		[SerializeField] public Button RetryNoButton;
 		[Header("Defeat")]
@@ -82,7 +84,7 @@ namespace GameJam
 				_victoryText.text = $"You managed to beat the game all by yourself, impressive! But remember there is no shame in accepting the help of others from time to time.";
 			}
 
-			await FadeInPanel(_victoryRoot, 0.5f);
+			await FadeInPanel(_victoryRoot, _victoryText, 0.5f);
 		}
 		public async UniTask HideVictory(float duration = 0.5f)
 		{
@@ -91,7 +93,7 @@ namespace GameJam
 
 		public async UniTask ShowComment()
 		{
-			await FadeInPanel(_commentRoot, 0.5f);
+			await FadeInPanel(_commentRoot, _commentText, 0.5f);
 		}
 		public async UniTask HideComment(float duration = 0.5f)
 		{
@@ -100,7 +102,7 @@ namespace GameJam
 
 		public async UniTask ShowRetry()
 		{
-			await FadeInPanel(_retryRoot, 0.5f);
+			await FadeInPanel(_retryRoot, _retryText, 0.5f);
 		}
 		public async UniTask HideRetry(float duration = 0.5f)
 		{
@@ -115,7 +117,7 @@ namespace GameJam
 				1 => $"Again? \n\nWhy don't you just give up already?!",
 				_ => $"You can't do this alone... \n\nGive up?"
 			};
-			await FadeInPanel(_giveUpRoot, 0.5f);
+			await FadeInPanel(_giveUpRoot, _giveUpText, 0.5f);
 		}
 		public async UniTask HideGiveUp(float duration = 0.5f)
 		{
@@ -125,7 +127,7 @@ namespace GameJam
 		public async UniTask ShowReceiveHelp(string helperName)
 		{
 			_receiveHelpText.text = $"Help offer received from \"{helperName}\".\n\nAccept the offer?";
-			await FadeInPanel(_receiveHelpRoot, 0.5f);
+			await FadeInPanel(_receiveHelpRoot, _receiveHelpText, 0.5f);
 		}
 		public async UniTask HideReceiveHelp(float duration = 0.5f)
 		{
@@ -141,28 +143,47 @@ namespace GameJam
 			await _fadeToBlackImage.DOColor(Color.clear, duration);
 		}
 
-		private async UniTask FadeInPanel(Image panel, float duration)
+		private async UniTask FadeInPanel(Image panel, TMP_Text text, float duration)
 		{
 			panel.gameObject.SetActive(true);
 			_ = panel.DOFade(1f, duration);
 
-			var graphics = panel.GetComponentsInChildren<Graphic>();
-			foreach (var graphic in graphics)
-			{
-				_ = graphic.DOFade(1f, duration);
-			}
+			text.maxVisibleCharacters = 0;
 
 			await UniTask.Delay(TimeSpan.FromSeconds(duration));
+
+			var totalInvisibleCharacters = text.textInfo.characterCount;
+			var counter = 0;
+			while (true)
+			{
+				var visibleCount = counter % (totalInvisibleCharacters + 1);
+				text.maxVisibleCharacters = visibleCount;
+
+				if (visibleCount >= totalInvisibleCharacters)
+				{
+					break;
+				}
+
+				counter += 1;
+
+				await UniTask.Delay(10);
+			}
+
+			var buttons = panel.GetComponentsInChildren<Button>();
+			foreach (var button in buttons)
+			{
+				_ = button.image.DOFade(1f, duration);
+			}
 		}
 
 		private async UniTask FadeOutPanel(Image panel, float duration)
 		{
 			_ = panel.DOFade(0f, duration);
 
-			var graphics = panel.GetComponentsInChildren<Graphic>();
-			foreach (var graphic in graphics)
+			var buttons = panel.GetComponentsInChildren<Button>();
+			foreach (var button in buttons)
 			{
-				_ = graphic.DOFade(0f, duration);
+				_ = button.image.DOFade(0f, duration);
 			}
 
 			await UniTask.Delay(TimeSpan.FromSeconds(duration));
