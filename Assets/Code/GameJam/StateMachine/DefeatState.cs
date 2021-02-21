@@ -40,7 +40,7 @@ namespace GameJam
 		private async void Continue()
 		{
 			_ui.HideGiveUp();
-			if (_state.DeathCounter < 3)
+			if (_state.DeathCounter < 3 || _state.HelpReceived)
 			{
 				RestartWithoutHelp();
 				return;
@@ -52,11 +52,11 @@ namespace GameJam
 			_ui.ReceiveHelpNoButton.onClick.AddListener(RestartWithoutHelp);
 		}
 
-		private void RestartWithHelp()
+		private async void RestartWithHelp()
 		{
 			_ui.HideReceiveHelp();
 
-			_ = _audioPlayer.StopMusic(1f);
+			await _audioPlayer.StopMusic();
 
 			_state.HelpersName = _helpers;
 			_state.HelpReceived = true;

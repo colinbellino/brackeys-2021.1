@@ -9,7 +9,7 @@ namespace GameJam
 	public class GameplayState : BaseGameState
 	{
 		private double _spawnHelperTimestamp;
-		private bool _transitionDone;
+		private bool _started;
 
 		public GameplayState(GameStateMachine machine, Game game) : base(machine, game) { }
 
@@ -33,13 +33,13 @@ namespace GameJam
 				_state.Player = await SpawnPlayer(_config.PlayerPrefab, _game, Game.PLAYER_SPAWN_POSITION);
 			}
 
+			var music = _state.HelpReceived ? _config.HelpReceivedMusic : _config.MainMusic;
 			if (_audioPlayer.IsMusicPlaying() == false)
 			{
-				var music = _state.HelpReceived ? _config.HelpReceivedMusic : _config.MainMusic;
-				_ = _audioPlayer.PlayMusic(music, false, 0.5f);
+				_ = _audioPlayer.PlayMusic(music, false, 1f);
 			}
 
-			await _ui.EndFadeToBlack();
+			await _ui.FadeOut();
 			if (_state.DeathCounter == 0)
 			{
 				_state.Player = await SpawnPlayer(_config.PlayerPrefab, _game, new Vector3(0f, Game.Bounds.min.y, 0f));
@@ -47,7 +47,7 @@ namespace GameJam
 			}
 
 			_spawnHelperTimestamp = Time.time + Game.HELPERS_SPAWN_INTERVAL;
-			_transitionDone = true;
+			_started = true;
 
 			_controls.Gameplay.Enable();
 		}
@@ -60,20 +60,20 @@ namespace GameJam
 			{
 				if (Keyboard.current.f1Key.wasPressedThisFrame)
 				{
-					_machine.Fire(GameStateMachine.Triggers.Victory);
+					Victory();
 				}
 				if (Keyboard.current.f2Key.wasPressedThisFrame)
 				{
-					_machine.Fire(GameStateMachine.Triggers.Defeat);
+					Defeat();
 				}
 				if (Keyboard.current.f3Key.wasPressedThisFrame)
 				{
 					_state.DeathCounter = 99;
-					_machine.Fire(GameStateMachine.Triggers.Defeat);
+					Defeat();
 				}
 			}
 
-			if (_transitionDone == false)
+			if (_started == false)
 			{
 				return;
 			}
@@ -126,7 +126,7 @@ namespace GameJam
 			{
 				if (_state.Waves.Count == 0)
 				{
-					_machine.Fire(GameStateMachine.Triggers.Victory);
+					Victory();
 					return;
 				}
 
@@ -141,7 +141,7 @@ namespace GameJam
 
 			if (_state.Player == null)
 			{
-				_machine.Fire(GameStateMachine.Triggers.Defeat);
+				Defeat();
 			}
 			else
 			{
@@ -153,9 +153,7 @@ namespace GameJam
 		{
 			await base.Exit();
 
-			_transitionDone = false;
-
-			await _ui.StartFadeToBlack();
+			_started = false;
 
 			if (_state.Player != null)
 			{
@@ -188,6 +186,20 @@ namespace GameJam
 			_ui.HideGameplay();
 
 			_controls.Gameplay.Disable();
+		}
+
+		private async void Victory()
+		{
+			_started = false;
+			await _ui.FadeIn(Color.white, 3f);
+			_machine.Fire(GameStateMachine.Triggers.Victory);
+		}
+
+		private async void Defeat()
+		{
+			_started = false;
+			await _ui.FadeIn(Color.black);
+			_machine.Fire(GameStateMachine.Triggers.Defeat);
 		}
 	}
 }
