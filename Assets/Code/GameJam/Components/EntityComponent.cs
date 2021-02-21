@@ -21,6 +21,7 @@ namespace GameJam
 		[SerializeField] public AudioClip FireClip;
 		[SerializeField] public AudioClip DamagedClip;
 		[SerializeField] public AudioClip DestroyedClip;
+		[SerializeField] public ParticleSystem DestroyedParticle;
 
 		[HideInInspector] public string Name;
 		[HideInInspector] public int Health = 1;

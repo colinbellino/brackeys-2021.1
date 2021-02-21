@@ -139,6 +139,11 @@ namespace GameJam
 
         public static void HitProjectile(ProjectileComponent component)
         {
+	        if (component.Data.HitParticle)
+	        {
+		        GameObject.Instantiate(component.Data.HitParticle, component.transform.position, Quaternion.identity);
+	        }
+
 	        component.Destroyed?.Invoke();
         }
 	}

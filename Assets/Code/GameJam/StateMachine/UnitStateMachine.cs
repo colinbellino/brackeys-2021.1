@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Stateless;
 using UnityEngine;
 using static GameJam.Utils;
+using Random = UnityEngine.Random;
 
 namespace GameJam
 {
@@ -315,6 +317,12 @@ namespace GameJam
 				if (_actor.DestroyedClip)
 				{
 					_ = _game.AudioPlayer.PlaySoundEffect(_actor.DestroyedClip);
+				}
+
+				if (_actor.DestroyedParticle)
+				{
+					GameObject.Instantiate(_actor.DestroyedParticle, _actor.transform.position, Quaternion.identity);
+					await UniTask.Delay(TimeSpan.FromSeconds(_actor.DestroyedParticle.main.duration));
 				}
 
 				if (_actor.Brain == Brain.Helper)

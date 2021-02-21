@@ -19,3 +19,4 @@ MonoBehaviour:
   HitColliderRadius: 0.4
   CanBeDestroyed: 1
   CanDestroyOtherProjectiles: 1
+  HitParticle: {fileID: 3314474866834917632, guid: 2bd89d7f79bc6c24392ba9c69da9aeb5, type: 3}
