@@ -63,9 +63,9 @@ namespace GameJam
 			_machine.Fire(GameStateMachine.Triggers.Retry);
 		}
 
-		private void RestartWithoutHelp()
+		private async void RestartWithoutHelp()
 		{
-			_ = _ui.HideReceiveHelp();
+			await _ui.HideReceiveHelp();
 
 			_machine.Fire(GameStateMachine.Triggers.Retry);
 		}

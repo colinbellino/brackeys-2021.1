@@ -44,10 +44,10 @@ namespace GameJam
 			await _ui.ShowRetry();
 		}
 
-		private void RetryYesClicked()
+		private async void RetryYesClicked()
 		{
-			_ = _ui.HideRetry();
 			_ = _ui.HideTitle();
+			await _ui.HideRetry();
 
 			_machine.Fire(GameStateMachine.Triggers.Retry);
 		}
