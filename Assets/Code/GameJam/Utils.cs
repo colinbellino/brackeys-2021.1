@@ -72,16 +72,16 @@ namespace GameJam
 	        {
 		        var projectile = projectileSpawner.Spawn(entity, shooter);
 		        projectile.Destroyed += () => projectileSpawner.Despawn(projectile);
-		        projectile.TriggerEntered += (projectile, collider) => Bla(projectile, collider, state.Running);
+		        projectile.TriggerEntered += (projectile, collider) => OnProjectileTriggerEnter(projectile, collider, state);
 		        state.Projectiles.Add(projectile);
 	        }
 
 	        entity.CanFireTimestamp = Time.time + entity.FireRate;
         }
 
-        private static void Bla(ProjectileComponent projectile, Collider2D collider, bool isGameRunning)
+        private static void OnProjectileTriggerEnter(ProjectileComponent projectile, Collider2D collider, GameState state)
         {
-	        if (isGameRunning)
+	        if (state.Running == false)
 	        {
 		        return;
 	        }
