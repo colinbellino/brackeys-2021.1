@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Networking;
 
 namespace GameJam
 {
@@ -77,8 +79,21 @@ namespace GameJam
 
         public static async UniTask<List<string>> LoadHelpers()
         {
-	        await UniTask.NextFrame();
-	        return Game.PlaceholderNames;
+	        try
+	        {
+		        var apiUrl = IsDevBuild()
+			        ? "http://localhost:8888/.netlify/functions/helpers"
+			        : "https://brackeys-2021-1.netlify.app/.netlify/functions/helpers";
+		        var request = await UnityWebRequest.Get(apiUrl).SendWebRequest();
+		        var text = request.downloadHandler.text;
+		        var response = JsonUtility.FromJson<APIHelpersResponse>(text);
+		        return new List<string>(response.authors);
+	        }
+	        catch (Exception)
+	        {
+		        Debug.Log("Couldn't load data from server, falling back to placeholders.");
+		        return Game.PlaceholderNames;
+	        }
         }
 	}
 }
