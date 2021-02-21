@@ -432,6 +432,7 @@ MonoBehaviour:
   Alliance: 1
   Brain: 1
   RotationPerTick: {x: 0, y: 0, z: 0}
+  InvulnerabilityDuration: 0
   Parts:
   - {fileID: 617558245227302624}
   - {fileID: 8737169888719058384}
@@ -442,6 +443,7 @@ MonoBehaviour:
   MoveDestination: {x: 0, y: 0, z: 0}
   HelperIndex: 0
   HelperAngle: 0
+  InvulnerabilityTimestamp: 0
 --- !u!50 &9131346481287055337
 Rigidbody2D:
   serializedVersion: 4

@@ -3,8 +3,20 @@
 <svg width="100%" height="100%" viewBox="0 0 300 300" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
     <g id="Artboard1" transform="matrix(1,0,0,1,-0.640856,-0.272125)">
         <rect x="0.641" y="0.272" width="299.929" height="299.929" style="fill:none;"/>
-        <g transform="matrix(1.80042,0,0,1.80042,-112.672,-123.819)">
+        <g transform="matrix(1.40066,0,0,1.40066,-54.2059,-62.9595)">
             <ellipse cx="146.251" cy="152.237" rx="74.982" ry="74.982" style="fill:white;"/>
+        </g>
+        <g transform="matrix(1,0,0,1,9.65962,-52.709)">
+            <circle cx="245.981" cy="202.981" r="18.707" style="fill:white;"/>
+        </g>
+        <g transform="matrix(1,0,0,1,-200.34,-52.709)">
+            <circle cx="245.981" cy="202.981" r="18.707" style="fill:white;"/>
+        </g>
+        <g transform="matrix(1,0,0,1,-95.2108,-157.579)">
+            <circle cx="245.981" cy="202.981" r="18.707" style="fill:white;"/>
+        </g>
+        <g transform="matrix(1,0,0,1,-95.2108,52.291)">
+            <circle cx="245.981" cy="202.981" r="18.707" style="fill:white;"/>
         </g>
     </g>
 </svg>
