@@ -702,7 +702,7 @@ MonoBehaviour:
   FireRate: 0.5
   MoveSpeed: 10
   RotateSpeed: 5
-  StartingHealth: 15
+  StartingHealth: 20
   Alliance: 0
   Brain: 2
   RotationPerTick: {x: 0, y: 0, z: 15}
