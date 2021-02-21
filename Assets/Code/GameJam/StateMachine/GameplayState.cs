@@ -36,7 +36,7 @@ namespace GameJam
 			if (_audioPlayer.IsMusicPlaying() == false)
 			{
 				var music = _state.HelpReceived ? _config.HelpReceivedMusic : _config.MainMusic;
-				_audioPlayer.PlayMusic(music, false, 0.5f);
+				_ = _audioPlayer.PlayMusic(music, false, 0.5f);
 			}
 
 			await _ui.EndFadeToBlack();

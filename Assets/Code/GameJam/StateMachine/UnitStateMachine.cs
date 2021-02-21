@@ -192,7 +192,10 @@ namespace GameJam
 			{
 				await base.Enter();
 
-				await _actor.transform.DOMove(_actor.MoveDestination, 3f).SetEase(Ease.InSine);
+				if (_actor.transform.position != _actor.MoveDestination)
+				{
+					await _actor.transform.DOMove(_actor.MoveDestination, 3f).SetEase(Ease.InSine);
+				}
 
 				_machine.Fire(Triggers.Done);
 			}
