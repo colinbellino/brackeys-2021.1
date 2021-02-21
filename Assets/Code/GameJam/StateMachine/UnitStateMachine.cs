@@ -174,11 +174,11 @@ namespace GameJam
 
 				if (confirmInput > 0f)
 				{
-					FireProjectile(_actor, _game.State, _game.ProjectileSpawner);
+					FireProjectile(_actor, _game.State, _game.AudioPlayer, _game.ProjectileSpawner);
 
 					foreach (var helper in _game.State.Helpers)
 					{
-						FireProjectile(helper, _game.State, _game.ProjectileSpawner);
+						FireProjectile(helper, _game.State, _game.AudioPlayer, _game.ProjectileSpawner);
 					}
 				}
 			}
@@ -259,7 +259,7 @@ namespace GameJam
 					shooter.transform.Rotate(_actor.RotationPerTick * Time.deltaTime);
 				}
 
-				FireProjectile(_actor, _game.State, _game.ProjectileSpawner);
+				FireProjectile(_actor, _game.State, _game.AudioPlayer, _game.ProjectileSpawner);
 			}
 		}
 
@@ -300,7 +300,7 @@ namespace GameJam
 
 				_actor.transform.position = Vector3.Lerp(_actor.transform.position, _destination, Time.deltaTime * _actor.MoveSpeed);
 
-				FireProjectile(_actor, _game.State, _game.ProjectileSpawner);
+				FireProjectile(_actor, _game.State, _game.AudioPlayer, _game.ProjectileSpawner);
 			}
 		}
 
