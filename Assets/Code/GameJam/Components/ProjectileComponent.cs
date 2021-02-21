@@ -14,6 +14,7 @@ namespace GameJam
 		[HideInInspector] public Projectile Data;
 
 		public Action Destroyed;
+		public Action<ProjectileComponent, Collider2D> TriggerEntered;
 
 		private void Update()
 		{
@@ -31,28 +32,7 @@ namespace GameJam
 
 		private void OnTriggerEnter2D(Collider2D collider)
 		{
-			var otherEntity = collider.GetComponentInParent<EntityComponent>();
-			if (otherEntity != null && otherEntity.Alliance != Alliance)
-			{
-				HitEntity(otherEntity);
-
-				HitProjectile(this);
-				return;
-			}
-
-			var otherProjectile = collider.GetComponentInParent<ProjectileComponent>();
-			if (otherProjectile != null && otherProjectile.Alliance != Alliance)
-			{
-				if (Data.CanDestroyOtherProjectiles && otherProjectile.Data.CanBeDestroyed)
-				{
-					HitProjectile(otherProjectile);
-				}
-
-				if (otherProjectile.Data.CanDestroyOtherProjectiles && Data.CanBeDestroyed)
-				{
-					HitProjectile(this);
-				}
-			}
+			TriggerEntered?.Invoke(this, collider);
 		}
 	}
 }

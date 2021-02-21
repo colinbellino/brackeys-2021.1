@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using TMPro;
@@ -40,12 +39,12 @@ namespace GameJam
 		private void Awake()
 		{
 			HideGameplay();
-			HideVictory(0f);
-			HideGiveUp(0f);
-			HideReceiveHelp(0f);
-			HideRetry(0f);
-			HideComment(0f);
-			HideTitle(0f);
+			_ = HideVictory(0f);
+			_ = HideGiveUp(0f);
+			_ = HideReceiveHelp(0f);
+			_ = HideRetry(0f);
+			_ = HideComment(0f);
+			_ = HideTitle(0f);
 		}
 
 		public void ShowGameplay() { _gameplayRoot.SetActive(true); }
@@ -85,7 +84,7 @@ namespace GameJam
 
 			await FadeInPanel(_victoryRoot, 0.5f);
 		}
-		public async UniTask HideVictory(float duration = 0.3f)
+		public async UniTask HideVictory(float duration = 0.5f)
 		{
 			await FadeOutPanel(_victoryRoot, duration);
 		}
@@ -94,7 +93,7 @@ namespace GameJam
 		{
 			await FadeInPanel(_commentRoot, 0.5f);
 		}
-		public async UniTask HideComment(float duration = 0.3f)
+		public async UniTask HideComment(float duration = 0.5f)
 		{
 			await FadeOutPanel(_commentRoot, duration);
 		}
@@ -103,7 +102,7 @@ namespace GameJam
 		{
 			await FadeInPanel(_retryRoot, 0.5f);
 		}
-		public async UniTask HideRetry(float duration = 0.3f)
+		public async UniTask HideRetry(float duration = 0.5f)
 		{
 			await FadeOutPanel(_retryRoot, duration);
 		}
@@ -118,7 +117,7 @@ namespace GameJam
 			};
 			await FadeInPanel(_giveUpRoot, 0.5f);
 		}
-		public async UniTask HideGiveUp(float duration = 0.3f)
+		public async UniTask HideGiveUp(float duration = 0.5f)
 		{
 			await FadeOutPanel(_giveUpRoot, duration);
 		}
@@ -128,7 +127,7 @@ namespace GameJam
 			_receiveHelpText.text = $"Help offer received from \"{helperName}\".\n\nAccept the offer?";
 			await FadeInPanel(_receiveHelpRoot, 0.5f);
 		}
-		public async UniTask HideReceiveHelp(float duration = 0.3f)
+		public async UniTask HideReceiveHelp(float duration = 0.5f)
 		{
 			await FadeOutPanel(_receiveHelpRoot, duration);
 		}
@@ -145,12 +144,12 @@ namespace GameJam
 		private async UniTask FadeInPanel(Image panel, float duration)
 		{
 			panel.gameObject.SetActive(true);
-			panel.DOFade(1f, duration);
+			_ = panel.DOFade(1f, duration);
 
 			var graphics = panel.GetComponentsInChildren<Graphic>();
 			foreach (var graphic in graphics)
 			{
-				graphic.DOFade(1f, duration);
+				_ = graphic.DOFade(1f, duration);
 			}
 
 			await UniTask.Delay(TimeSpan.FromSeconds(duration));
@@ -158,12 +157,12 @@ namespace GameJam
 
 		private async UniTask FadeOutPanel(Image panel, float duration)
 		{
-			panel.DOFade(0f, duration);
+			_ = panel.DOFade(0f, duration);
 
 			var graphics = panel.GetComponentsInChildren<Graphic>();
 			foreach (var graphic in graphics)
 			{
-				graphic.DOFade(0f, duration);
+				_ = graphic.DOFade(0f, duration);
 			}
 
 			await UniTask.Delay(TimeSpan.FromSeconds(duration));

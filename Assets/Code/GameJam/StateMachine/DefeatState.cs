@@ -14,9 +14,11 @@ namespace GameJam
 		{
 			await base.Enter();
 
-			_ui.ShowGiveUp(_state.DeathCounter);
+			_ = _ui.ShowGiveUp(_state.DeathCounter);
 			_ui.GiveUpYesButton.onClick.AddListener(GiveUp);
 			_ui.GiveUpNoButton.onClick.AddListener(Continue);
+			_ui.ReceiveHelpYesButton.onClick.AddListener(RestartWithHelp);
+			_ui.ReceiveHelpNoButton.onClick.AddListener(RestartWithoutHelp);
 
 			_state.DeathCounter += 1;
 			_ui.SetCounter(_state.DeathCounter);
@@ -39,7 +41,7 @@ namespace GameJam
 
 		private async void Continue()
 		{
-			_ui.HideGiveUp();
+			await _ui.HideGiveUp();
 			if (_state.DeathCounter < 3 || _state.HelpReceived)
 			{
 				RestartWithoutHelp();
@@ -47,15 +49,12 @@ namespace GameJam
 			}
 
 			_helpers = await Utils.LoadHelpers();
-			_ui.ShowReceiveHelp(_helpers[Random.Range(0, _helpers.Count)]);
-			_ui.ReceiveHelpYesButton.onClick.AddListener(RestartWithHelp);
-			_ui.ReceiveHelpNoButton.onClick.AddListener(RestartWithoutHelp);
+			_ = _ui.ShowReceiveHelp(_helpers[Random.Range(0, _helpers.Count)]);
 		}
 
 		private async void RestartWithHelp()
 		{
-			_ui.HideReceiveHelp();
-
+			await _ui.HideReceiveHelp();
 			await _audioPlayer.StopMusic();
 
 			_state.HelpersName = _helpers;
@@ -66,7 +65,7 @@ namespace GameJam
 
 		private void RestartWithoutHelp()
 		{
-			_ui.HideReceiveHelp();
+			_ = _ui.HideReceiveHelp();
 
 			_machine.Fire(GameStateMachine.Triggers.Retry);
 		}

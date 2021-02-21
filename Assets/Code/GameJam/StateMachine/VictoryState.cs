@@ -1,5 +1,4 @@
 ﻿using Cysharp.Threading.Tasks;
-using UnityEngine;
 
 namespace GameJam
 {
@@ -12,7 +11,9 @@ namespace GameJam
 			await base.Enter();
 
 			await _ui.ShowTitle();
-			_ui.ShowVictory(_state.HelpReceived);
+			await UniTask.Delay(1000);
+
+			await _ui.ShowVictory(_state.HelpReceived);
 			_ui.VictoryNextButton.onClick.AddListener(VictoryNextClicked);
 			_ui.CommentNextButton.onClick.AddListener(CommentNextClicked);
 			_ui.RetryYesButton.onClick.AddListener(RetryYesClicked);
@@ -31,22 +32,22 @@ namespace GameJam
 			_ui.RetryNoButton.onClick.RemoveListener(RetryNoClicked);
 		}
 
-		private void VictoryNextClicked()
+		private async void VictoryNextClicked()
 		{
-			_ui.HideVictory();
-			_ui.ShowComment();
+			await _ui.HideVictory();
+			await _ui.ShowComment();
 		}
 
-		private void CommentNextClicked()
+		private async void CommentNextClicked()
 		{
-			_ui.HideComment();
-			_ui.ShowRetry();
+			await _ui.HideComment();
+			await _ui.ShowRetry();
 		}
 
-		private async void RetryYesClicked()
+		private void RetryYesClicked()
 		{
-			_ui.HideRetry();
-			await _ui.HideTitle(0f);
+			_ = _ui.HideRetry();
+			_ = _ui.HideTitle();
 
 			_machine.Fire(GameStateMachine.Triggers.Retry);
 		}
