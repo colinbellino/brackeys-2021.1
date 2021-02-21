@@ -12,5 +12,6 @@ namespace GameJam
 		public List<string> HelpersName = new List<string>();
 		public EntityComponent[] Helpers;
 		public int DeathCounter;
+		public bool Running;
 	}
 }

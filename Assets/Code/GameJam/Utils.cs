@@ -72,10 +72,42 @@ namespace GameJam
 	        {
 		        var projectile = projectileSpawner.Spawn(entity, shooter);
 		        projectile.Destroyed += () => projectileSpawner.Despawn(projectile);
+		        projectile.TriggerEntered += (projectile, collider) => Bla(projectile, collider, state.Running);
 		        state.Projectiles.Add(projectile);
 	        }
 
 	        entity.CanFireTimestamp = Time.time + entity.FireRate;
+        }
+
+        private static void Bla(ProjectileComponent projectile, Collider2D collider, bool isGameRunning)
+        {
+	        if (isGameRunning)
+	        {
+		        return;
+	        }
+
+	        var otherEntity = collider.GetComponentInParent<EntityComponent>();
+	        if (otherEntity != null && otherEntity.Alliance != projectile.Alliance)
+	        {
+		        HitEntity(otherEntity);
+
+		        HitProjectile(projectile);
+		        return;
+	        }
+
+	        var otherProjectile = collider.GetComponentInParent<ProjectileComponent>();
+	        if (otherProjectile != null && otherProjectile.Alliance != projectile.Alliance)
+	        {
+		        if (projectile.Data.CanDestroyOtherProjectiles && otherProjectile.Data.CanBeDestroyed)
+		        {
+			        HitProjectile(otherProjectile);
+		        }
+
+		        if (otherProjectile.Data.CanDestroyOtherProjectiles && projectile.Data.CanBeDestroyed)
+		        {
+			        HitProjectile(projectile);
+		        }
+	        }
         }
 
         public static async UniTask<List<string>> LoadHelpers()

@@ -9,7 +9,6 @@ namespace GameJam
 	public class GameplayState : BaseGameState
 	{
 		private double _spawnHelperTimestamp;
-		private bool _started;
 
 		public GameplayState(GameStateMachine machine, Game game) : base(machine, game) { }
 
@@ -47,7 +46,7 @@ namespace GameJam
 			}
 
 			_spawnHelperTimestamp = Time.time + Game.HELPERS_SPAWN_INTERVAL;
-			_started = true;
+			_state.Running = true;
 
 			_controls.Gameplay.Enable();
 		}
@@ -73,7 +72,7 @@ namespace GameJam
 				}
 			}
 
-			if (_started == false)
+			if (_state.Running == false)
 			{
 				return;
 			}
@@ -153,7 +152,7 @@ namespace GameJam
 		{
 			await base.Exit();
 
-			_started = false;
+			_state.Running = false;
 
 			if (_state.Player != null)
 			{
@@ -190,14 +189,14 @@ namespace GameJam
 
 		private async void Victory()
 		{
-			_started = false;
+			_state.Running = false;
 			await _ui.FadeIn(Color.white, 3f);
 			_machine.Fire(GameStateMachine.Triggers.Victory);
 		}
 
 		private async void Defeat()
 		{
-			_started = false;
+			_state.Running = false;
 			await _ui.FadeIn(Color.black);
 			_machine.Fire(GameStateMachine.Triggers.Defeat);
 		}
