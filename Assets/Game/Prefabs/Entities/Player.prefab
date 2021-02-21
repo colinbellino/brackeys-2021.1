@@ -440,6 +440,7 @@ MonoBehaviour:
   FireClip: {fileID: 8300000, guid: 4170a33209a5a3e4d983f445b66c5c4e, type: 3}
   DamagedClip: {fileID: 8300000, guid: 02c5a8f2e04749e4cb09137a46ec41f6, type: 3}
   DestroyedClip: {fileID: 8300000, guid: fc2193c73482093459c07f2c7b440a57, type: 3}
+  Name: 
   Health: 1
   RotationOffset: 0
   CanFireTimestamp: 0

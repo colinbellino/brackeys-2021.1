@@ -22,6 +22,7 @@ namespace GameJam
 		[SerializeField] public AudioClip DamagedClip;
 		[SerializeField] public AudioClip DestroyedClip;
 
+		[HideInInspector] public string Name;
 		[HideInInspector] public int Health = 1;
 		[HideInInspector] public float RotationOffset;
 		[HideInInspector] public float CanFireTimestamp;

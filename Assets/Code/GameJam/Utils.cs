@@ -39,6 +39,7 @@ namespace GameJam
 	        entity.Health = 1;
 	        entity.MoveDestination = game.State.Player.transform.position;
 	        entity.HelperIndex = index;
+	        entity.Name = name;
 	        entity.StateMachine = new UnitStateMachine(false, game, entity);
 	        await entity.StateMachine.Start();
 	        return entity;
@@ -125,11 +126,6 @@ namespace GameJam
 
 	        if (entity.Health <= 0)
 	        {
-		        if (entity.DestroyedClip)
-		        {
-			        _ = audioPlayer.PlaySoundEffect(entity.DestroyedClip);
-		        }
-
 		        entity.StateMachine.Fire(UnitStateMachine.Triggers.Destroyed);
 	        }
 	        else
