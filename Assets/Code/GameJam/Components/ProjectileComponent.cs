@@ -1,4 +1,5 @@
 ﻿using System;
+using DG.Tweening;
 using UnityEngine;
 
 namespace GameJam
@@ -57,6 +58,8 @@ namespace GameJam
 		public static void HitEntity(EntityComponent entity)
 		{
 			entity.Health -= 1;
+
+			entity.Parts[0].transform.DOShakePosition(0.2f, 0.15f, 20, 90f, false, true);
 
 			if (entity.Parts.Length > 0)
 			{
