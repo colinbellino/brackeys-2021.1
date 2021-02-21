@@ -59,9 +59,9 @@ async function extractAuthors ()
         }
     });
 
-    if (authors.length < fixtures.length) {
-        authors = authors.concat(fixtures);
-    }
+    // if (authors.length < fixtures.length) {
+    //     authors = authors.concat(fixtures);
+    // }
 
     return authors;
 }
